@@ -1,0 +1,153 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFF3F0;
+        }
+
+        .sidebar {
+            background-color: white;
+            border:2px solid;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 60px;
+            transition: all 0.3s ease-in-out;
+            z-index: 1030;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: #FFB4A2;
+            color: #000;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        .accordion-button {
+            background-color: #FFCDB2;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #E5989B;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navbar (for mobile toggle) -->
+<nav class="navbar navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+        <button class="btn btn-outline-secondary d-md-none" type="button" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="navbar-brand mb-0 h1">FollowUp Admin</span>
+    </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h5 class="text-center mb-4">Admin Menu</h5>
+    <div class="accordion" id="adminSidebar">
+
+    <!-- Master -->
+<div class="accordion-item border-0">
+    <h2 class="accordion-header" id="masterHeading">
+        <button class="accordion-button collapsed d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#masterCollapse">
+            <span><i class="bi bi-gear me-2"></i> Master</span>
+        
+        </button>
+    </h2>
+    <div id="masterCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
+        <div class="accordion-body p-0">
+            <a href="#" class="nav-link ps-5">Course</a>
+            <a href="#" class="nav-link ps-5">Department</a>
+            <a href="#" class="nav-link ps-5">Employee</a>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Follow Up -->
+        <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="followUpHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#followUpCollapse">
+                    <i class="bi bi-clipboard2-check me-2"></i> Follow Up
+                </button>
+            </h2>
+            <div id="followUpCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
+                <div class="accordion-body p-0">
+                    <a href="#" class="nav-link ps-5">Remaining</a>
+                    <a href="#" class="nav-link ps-5">Completed</a>
+                </div>
+            </div>
+        </div>
+
+        <a href="#" class="nav-link px-3"><i class="bi bi-check2-square me-2"></i> Task</a>
+
+        <!-- Report -->
+        <div class="accordion-item border-0">
+            <h2 class="accordion-header" id="reportHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#reportCollapse">
+                    <i class="bi bi-bar-chart-line me-2"></i> Report
+                </button>
+            </h2>
+            <div id="reportCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
+                <div class="accordion-body p-0">
+                    <a href="#" class="nav-link ps-5">Daily</a>
+                    <a href="#" class="nav-link ps-5">Weekly</a>
+                    <a href="#" class="nav-link ps-5">Monthly</a>
+                    <a href="#" class="nav-link ps-5">Yearly</a>
+                </div>
+            </div>
+        </div>
+
+        <a href="#" class="nav-link px-3"><i class="bi bi-kanban me-2"></i> Task Management</a>
+
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+    });
+</script>
+</body>
+</html>
