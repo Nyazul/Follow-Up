@@ -11,7 +11,7 @@
 <div class="container mt-5 p-4 bg-white rounded shadow">
     <h2 class="mb-4 text-center">Add Course</h2>
 
-    <!-- Add Course Form -->
+    <!-- Add Course - Form -->
     <form action="/course/add" method="post">
         <div class="mb-3">
             <label for="courseName" class="form-label">Course Name</label>
