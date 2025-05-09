@@ -5,42 +5,35 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Represents a task in the application.
- */
 @Entity
-@Table(name = "task")
+@Table(name = "lead")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Task {
+public class Lead {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private long id;
+    private Long id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "body", nullable = true)
-    private String body;
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
 
-    @Column(name = "due_date", nullable = false)
-    private LocalDateTime dueDate;
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
 
-    //Forign key to User
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonBackReference
-    private User user;
+    @Column(name = "address", nullable = false)
+    private String address;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -50,6 +43,6 @@ public class Task {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_completed", nullable = false)
-    private boolean isCompleted;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
 }

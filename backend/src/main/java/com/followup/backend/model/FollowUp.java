@@ -37,11 +37,12 @@ public class FollowUp {
     @Column(name = "id", nullable = false)
     private long id;
 
-    // Change to User
-    @Column(name = "user_id", nullable = false)
-    private String user;
+    @OneToOne
+    @JoinColumn(name = "lead_id", referencedColumnName = "id", nullable = false)
+    private Lead lead;
+    
 
-    @Column(name = "desciption", nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "status", nullable = false)
@@ -53,7 +54,7 @@ public class FollowUp {
 
     @OneToMany(mappedBy = "followUp", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Node> nodes;
+    private List<FollowUpNode> nodes;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -74,7 +75,7 @@ public class FollowUp {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     @JsonBackReference
-    private Employee employee;
+    private FollowUpEmployee employee;
 
 }
 

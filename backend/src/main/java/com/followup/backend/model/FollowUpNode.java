@@ -13,13 +13,13 @@ import lombok.*;
  * Represents a node (single follow-up) in the user's follow-up list.
  */
 @Entity
-@Table(name = "node")
+@Table(name = "followup_node")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Node {
+public class FollowUpNode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,9 +35,10 @@ public class Node {
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
-    // Change String to Employee
-    @Column(name = "done_by", nullable = true)
-    private String doneBy;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "done_by", referencedColumnName = "id", nullable = false)
+    private FollowUpEmployee doneBy;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
