@@ -1,4 +1,4 @@
-package com.followup.backend.controllers;
+package com.followup.backend.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
