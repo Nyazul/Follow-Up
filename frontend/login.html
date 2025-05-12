@@ -1,118 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> KK Wagh College Login </title>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      display: flex;
-      height: 100vh;
-      align-items: center;
-      justify-content: center;
+      background-color: rgb(181, 130, 140);
     }
 
-    .container {
-      display: flex;
-      max-width: 900px;
-      background: #fff;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background-color: white;
       border-radius: 10px;
-      overflow: hidden;
+      box-shadow: 0 0 15px rgb(181, 130, 140);
     }
 
-    .left {
-      flex: 1;
-      background-color: #f2f2f2;
-      padding: 40px;
-    }
-
-    .left h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    .left p {
-      color: #555;
-      line-height: 1.6;
-    }
-    .right {
-      flex: 1;
-      background: white;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .right h2 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      outline: none;
-      font-size: 16px;
-    }
-
-    .input-group input::placeholder {
-      color: rgb(104, 18, 18);
-    }
-
-    .btn {
-      background-color: rgb(104, 18, 18);
-      color: white;
-      padding: 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .btn:hover {
-      background-color: rgb(255, 0, 119);
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-
-      .left, .right {
-        flex: 1;
-        width: 100%;
-      }
+    .form-section {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="center">
-    
-      
-    </div>
-    <div class="right">
-      <h2>Sign in</h2>
-      <div class="input-group">
-        <input type="text" placeholder="Username" />
-      </div>
-      <div class="input-group">
-        <input type="password" placeholder="Password" />
-      </div>
-      <button class="btn">Sign In</button>
-    </div>
+
+<div class="login-container">
+  <h4 class="text-center mb-4">Welcome! Please log in</h4>
+
+  <div class="dropdown text-center mb-4">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+      Login as
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#" onclick="showForm('admin')">Admin</a></li>
+      <li><a class="dropdown-item" href="#" onclick="showForm('employee')">Employee</a></li>
+    </ul>
   </div>
+
+  <!-- Admin Login Form -->
+  <form id="adminForm" class="form-section">
+    <div class="mb-3">
+      <label for="adminUsername" class="form-label">Admin Username</label>
+      <input type="text" class="form-control" id="adminUsername" required>
+    </div>
+    <div class="mb-3">
+      <label for="adminPassword" class="form-label">Password</label>
+      <input type="password" class="form-control" id="adminPassword" required>
+    </div>
+    <button type="submit" class="btn btn-success w-100">Login as Admin</button>
+  </form>
+
+  <!-- Employee Login Form -->
+  <form id="employeeForm" class="form-section">
+    <div class="mb-3">
+      <label for="employeeUsername" class="form-label">Employee Username</label>
+      <input type="text" class="form-control" id="employeeUsername" required>
+    </div>
+    <div class="mb-3">
+      <label for="employeePassword" class="form-label">Password</label>
+      <input type="password" class="form-control" id="employeePassword" required>
+    </div>
+    <button type="submit" class="btn btn-success w-100">Login as Employee</button>
+  </form>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function showForm(role) {
+    document.getElementById('adminForm').style.display = 'none';
+    document.getElementById('employeeForm').style.display = 'none';
+
+    if (role === 'admin') {
+      document.getElementById('adminForm').style.display = 'block';
+    } else {
+      document.getElementById('employeeForm').style.display = 'block';
+    }
+  }
+
+  // Admin form login handler
+  document.getElementById('adminForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
+
+    if (username === 'admin' && password === 'admin123') {
+      window.location.href = 'adminpannel.html';
+    } else {
+      alert('Invalid admin credentials');
+    }
+  });
+
+  // Employee form login handler
+  document.getElementById('employeeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('employeeUsername').value;
+    const password = document.getElementById('employeePassword').value;
+
+    if (username === 'employee' && password === 'employee123') {
+      window.location.href = 'adminpannel.html';
+    } else {
+      alert('Invalid employee credentials');
+    }
+  });
+</script>
+
 </body>
 </html>
-
