@@ -8,10 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     
     <style>
-       
-
         .sidebar {
-            background-color: rgb(216, 208, 210);
+            background-color: rgb(181, 130, 140);;
             
             height: 100vh;
             position: fixed;
@@ -28,7 +26,7 @@
             font-weight: 500;
         }
 
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+         .sidebar .nav-link:hover, .sidebar .nav-link.active {
             background-color: rgb(181, 130, 140);
            
         }
@@ -37,9 +35,6 @@
             margin-left: 250px;
             padding: 2rem;
         }
-
-       
-
         .accordion-button {
             background-color: rgb(181, 130, 140);
             
@@ -50,6 +45,7 @@
             
             
         }
+        
     </style>
 </head>
 <body>
@@ -60,7 +56,8 @@
     <h5 class="text-center mb-4">Follow-Up System</h5>
     <div class="accordion" id="adminSidebar">
 
-        <a href="#" class="nav-link px-3"><i class="bi bi-grid me-2"></i> Dashboard</a>
+        <a href="#" class="nav-link px-3" onclick="showDashboard(this)"><i class="bi bi-grid me-2"></i> Dashboard</a>
+
 
     <!-- Master -->
 <div class="accordion-item border-0">
@@ -74,7 +71,7 @@
         <div class="accordion-body p-0">
             <a href="#" class="nav-link ps-5" onclick="loadPage('addcourse.html')">Course</a>
 
-            <a href="#" class="nav-link ps-5" onclick="loadPage('adddepartment.html')">Department</a>
+            <a href="#" class="nav-link ps-5" onclick="loadPage('adddepartment.html', this)">Department</a>
             <a href="#" class="nav-link ps-5"  onclick="loadPage('addemployee.html')">Employee</a>
         </div>
     </div>
@@ -90,7 +87,7 @@
             </h2>
             <div id="followUpCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
                 <div class="accordion-body p-0">
-                    <a href="#" class="nav-link ps-5" onclick="loadPage('remaining.html')">Remaining</a>
+                    <a href="#" class="nav-link ps-5" onclick="loadPage('remainingfollowup.html')">Remaining</a>
                     <a href="#" class="nav-link ps-5" onclick="loadPage('completefollowup.html')" >Completed</a>
                 </div>
             </div>
@@ -105,15 +102,15 @@
             </h2>
             <div id="leadsCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
                 <div class="accordion-body p-0">
-                    <a href="#" class="nav-link ps-5" onclick="loadPage('add2.html')">Add lead</a>
+                   <a href="#" class="nav-link ps-5" onclick="loadPage('add2.html', this)">Add lead</a>
+
                     <a href="#" class="nav-link ps-5">View lead</a>
                 </div>
             </div>
         </div>
 
-        <a href="#" class="nav-link px-3"><i class="bi bi-check2-square me-2"></i> Task</a>
-
-        <a href="#" class="nav-link px-3"><i class="bi bi-bell me-2"></i> Notification</a>
+        <a href="#" class="nav-link px-3" onclick="loadPage('task.html')" >
+            <i class="bi bi-check2-square me-2"></i> Task</a>
 
        
         <div class="accordion-body p-0">
@@ -126,22 +123,41 @@
         </div>
 
         <a href="#" class="nav-link px-3"><i class="bi bi-kanban me-2"></i> Task Management</a>
-
-        <a href="#" class="nav-link px-3"><i class="bi bi-wallet2 me-2"></i>Payment history</a>
-
-
     </div>
 </div>
 <div class="main">
     <!-- Top navbar/message -->
     <nav class="content navbar navbar-light bg-white shadow-sm px-4 d-flex justify-content-between align-items-center">
         <span class="navbar-brand mb-0 h1">Welcome </span>
-        <button style="background-color: rgb(229, 152, 155);"class="btn" onclick="logout()">Logout</button>
-        <div class="row mb-4">
+        <button style="background-color: rgb(229, 152, 155);" class="btn" onclick="window.location.href='login.html'">Logout</button>
+        
       
     </nav>
     
-    </nav>
+     <div id="dashboardCards" class="container-fluid">
+  <div class="row justify-content-center justify-content-lg-end mb-4">
+    <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+      <div class="card text-center p-3 shadow">
+        <strong>120</strong>
+        <div>Total Contacts</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+      <div class="card text-center p-3 shadow">
+        <strong>5</strong>
+        <div>Pending Tasks</div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-4 col-lg-3 mb-3">
+      <div class="card text-center p-3 shadow">
+        <strong>18</strong>
+        <div>Completed Tasks</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
     
 
     <!-- Dynamic content will load here -->
@@ -163,7 +179,14 @@
     });
 </script>
 <script>
-    function loadPage(url) {
+    function loadPage(url, el = null) {
+        // Hide the dashboard cards
+        const cards = document.getElementById("dashboardCards");
+        if (cards) {
+            cards.style.display = "none";
+        }
+
+        // Load the page content dynamically
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -178,12 +201,34 @@
                 console.error("Error loading the page:", error);
                 document.getElementById("mainContent").innerHTML = "<p>Error loading content.</p>";
             });
+
+        // Handle active class
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        if (el) {
+            el.classList.add('active');
+        }
     }
 </script>
 <script>
-    function logout() {
-        
-        window.location.href = 'login.html';
+    function showDashboard(el = null) {
+        // Show the dashboard cards
+        const cards = document.getElementById("dashboardCards");
+        if (cards) {
+            cards.style.display = "block";
+        }
+
+        // Clear any dynamic content
+        document.getElementById("mainContent").innerHTML = "";
+
+        // Update active link styling
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        if (el) {
+            el.classList.add('active');
+        }
     }
 </script>
 
