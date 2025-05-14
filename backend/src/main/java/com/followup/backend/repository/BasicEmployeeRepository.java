@@ -8,4 +8,6 @@ import com.followup.backend.model.BasicEmployee;
 @Repository
 public interface BasicEmployeeRepository extends JpaRepository<BasicEmployee, Long> {
 
+    BasicEmployee findByEmailAndPassword(String email, String password);
+
 }

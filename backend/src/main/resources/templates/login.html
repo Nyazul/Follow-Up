@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      >
 <head>
   <meta charset="UTF-8">
   <title>Login Page</title>
@@ -26,6 +28,9 @@
 <body>
 
 <div class="login-container">
+
+  <div th:if="*{error!=null and #strings.length(error)>0}" class="alert text-danger text-center" th:text="${error}"></div>
+
   <h4 class="text-center mb-4">Welcome! Please log in</h4>
 
   <div class="dropdown text-center mb-4">
@@ -39,29 +44,29 @@
   </div>
 
   <!-- Admin Login Form -->
-  <form id="adminForm" class="form-section">
+  <form id="adminForm" class="form-section" th:action="@{/login}" method="post">
     <div class="mb-3">
-      <label for="adminUsername" class="form-label">Admin Username</label>
-      <input type="text" class="form-control" id="adminUsername" required>
+      <label for="email" class="form-label">Admin Email</label>
+      <input type="text" class="form-control" name="email" id="email" required>
     </div>
     <div class="mb-3">
-      <label for="adminPassword" class="form-label">Password</label>
-      <input type="password" class="form-control" id="adminPassword" required>
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" name="password" id="password" required>
     </div>
-    <button type="submit" class="btn btn-success w-100">Login as Admin</button>
+    <button type="submit" class="btn btn-success w-100" name="role" value="ADMIN" >Login as Admin</button>
   </form>
 
   <!-- Employee Login Form -->
-  <form id="employeeForm" class="form-section">
+  <form id="employeeForm" class="form-section" th:action="@{/login}" method="post">
     <div class="mb-3">
-      <label for="employeeUsername" class="form-label">Employee Username</label>
-      <input type="text" class="form-control" id="employeeUsername" required>
+      <label for="email" class="form-label">Employee Email</label>
+      <input type="text" class="form-control" name="email" id="email" required>
     </div>
     <div class="mb-3">
-      <label for="employeePassword" class="form-label">Password</label>
-      <input type="password" class="form-control" id="employeePassword" required>
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" name="password" id="password" required>
     </div>
-    <button type="submit" class="btn btn-success w-100">Login as Employee</button>
+    <button type="submit" class="btn btn-success w-100" name="role" value="EMPLOYEE" >Login as Employee</button>
   </form>
 </div>
 
@@ -80,31 +85,6 @@
     }
   }
 
-  // Admin form login handler
-  document.getElementById('adminForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('adminUsername').value;
-    const password = document.getElementById('adminPassword').value;
-
-    if (username === 'admin' && password === 'admin123') {
-      window.location.href = 'adminpannel.html';
-    } else {
-      alert('Invalid admin credentials');
-    }
-  });
-
-  // Employee form login handler
-  document.getElementById('employeeForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('employeeUsername').value;
-    const password = document.getElementById('employeePassword').value;
-
-    if (username === 'employee' && password === 'employee123') {
-      window.location.href = 'adminpannel.html';
-    } else {
-      alert('Invalid employee credentials');
-    }
-  });
 </script>
 
 </body>
