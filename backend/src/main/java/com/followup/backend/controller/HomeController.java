@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.followup.backend.model.Admin;
 import com.followup.backend.model.User;
 import com.followup.backend.repository.AdminRepository;
 import com.followup.backend.repository.BasicEmployeeRepository;
@@ -54,13 +55,13 @@ public class HomeController {
 
             if ((user = adminRepository.findByEmailAndPassword(email, password)) != null) {
                 session.setAttribute("user", user);
-                return "adminpannel";
+                return "redirect:/adminpannel";
             } else {
                 redirAttrs.addFlashAttribute("error", "Invalid email or password");
                 return "redirect:/login";
             }
             
-        } else if (role.equals("EMPLOYEE")) {
+        } else {
             if ((user = followUpEmployeeRepository.findByEmailAndPassword(email, password)) != null) {
                 session.setAttribute("user", user);
                 return "remainingfollowup";
@@ -75,9 +76,17 @@ public class HomeController {
             }
         }
         
-        return "";
-        
     }
     
+    @GetMapping("/adminpannel")
+    public String adminPannel(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user != null && user.getRole().equals("ADMIN")) {
+            return "adminpannel";
+        } else {
+            System.out.println(user);
+            return "redirect:/login";
+        }
+    }
 
 }
