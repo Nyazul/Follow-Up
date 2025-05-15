@@ -31,7 +31,7 @@ public class Course {
     @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
     private Department department;
 
-    @CreationTimestamp
+    @CreationTimestamp //AUTOMATICALLY SETS TO CURRENT TIMESTAMP
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

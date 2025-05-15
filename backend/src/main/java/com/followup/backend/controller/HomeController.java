@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.followup.backend.model.User;
 import com.followup.backend.repository.AdminRepository;
 import com.followup.backend.repository.BasicEmployeeRepository;
+import com.followup.backend.repository.CourseRepository;
 import com.followup.backend.repository.FollowUpEmployeeRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequestMapping
 public class HomeController {
+
+    @Autowired
+    CourseRepository courseRepository;
 
     @Autowired
     AdminRepository adminRepository;
@@ -85,6 +89,14 @@ public class HomeController {
             System.out.println(user);
             return "redirect:/login";
         }
+
+        
+    }
+
+    @GetMapping("/data")
+    public String test() {
+        System.out.println("\n\n"+adminRepository.findAll()+"\n\n");
+        return "login";        
     }
 
 }
