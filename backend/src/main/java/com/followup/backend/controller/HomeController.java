@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.followup.backend.model.Admin;
 import com.followup.backend.model.User;
 import com.followup.backend.repository.AdminRepository;
 import com.followup.backend.repository.BasicEmployeeRepository;
@@ -51,7 +50,6 @@ public class HomeController {
         User user = null;
 
         if (role.equals("ADMIN")) {
-            
 
             if ((user = adminRepository.findByEmailAndPassword(email, password)) != null) {
                 session.setAttribute("user", user);

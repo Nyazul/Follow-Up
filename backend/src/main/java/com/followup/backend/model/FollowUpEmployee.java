@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString(callSuper = true)
 @DiscriminatorValue("FOLLOWUP_EMPLOYEE")
 public class FollowUpEmployee extends User {
 
@@ -20,7 +21,7 @@ public class FollowUpEmployee extends User {
     private List<FollowUp> followUps;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = true)
     private Department department;
 
     @Transient

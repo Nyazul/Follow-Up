@@ -1,9 +1,12 @@
 package com.followup.backend.model;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 @Entity
 @DiscriminatorValue("BASIC_EMPLOYEE")
+@ToString(callSuper = true)
+
 public class BasicEmployee extends User {
     @Override
     public String getRole() {
