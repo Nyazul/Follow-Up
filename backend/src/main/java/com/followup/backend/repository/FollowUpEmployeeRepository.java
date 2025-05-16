@@ -10,4 +10,6 @@ public interface FollowUpEmployeeRepository extends JpaRepository<FollowUpEmploy
 
     FollowUpEmployee findByEmailAndPassword(String email, String password);
 
+    FollowUpEmployee findByEmail(String email);
+
 }

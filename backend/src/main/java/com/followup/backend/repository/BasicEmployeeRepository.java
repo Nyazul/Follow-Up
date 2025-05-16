@@ -10,4 +10,6 @@ public interface BasicEmployeeRepository extends JpaRepository<BasicEmployee, Lo
 
     BasicEmployee findByEmailAndPassword(String email, String password);
 
+    BasicEmployee findByEmail(String email);
+
 }

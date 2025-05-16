@@ -49,6 +49,7 @@ public class FollowUp {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @CreationTimestamp
     @Column(name = "due_date", nullable = false)
     private LocalDateTime dueDate;
 
@@ -77,6 +78,26 @@ public class FollowUp {
     @JsonBackReference
     private FollowUpEmployee employee;
 
+    public String getRecentNodeTitleAndBody() {
+        if (nodes == null || nodes.isEmpty()) {
+            return "No follow-up nodes";
+        }
+    
+        FollowUpNode recentNode = nodes.stream()
+                .filter(node -> !node.isDeleted()) // skip deleted nodes
+                .max((n1, n2) -> n1.getDate().compareTo(n2.getDate()))
+                .orElse(null);
+    
+        if (recentNode == null) {
+            return "No active follow-up nodes";
+        }
+    
+        String title = recentNode.getTitle() != null ? recentNode.getTitle() : "Untitled";
+        String body = recentNode.getBody() != null ? recentNode.getBody() : "No content";
+    
+        return "<strong> " + title.toUpperCase() + "</strong> : " + body;
+    }
+    
 }
 
 /*

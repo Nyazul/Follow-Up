@@ -19,7 +19,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"user"})
 public class Task {
 
     @Id

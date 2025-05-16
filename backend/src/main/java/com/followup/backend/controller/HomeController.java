@@ -2,36 +2,29 @@ package com.followup.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.followup.backend.model.User;
-import com.followup.backend.repository.AdminRepository;
-import com.followup.backend.repository.BasicEmployeeRepository;
-import com.followup.backend.repository.CourseRepository;
-import com.followup.backend.repository.FollowUpEmployeeRepository;
+import com.followup.backend.model.*;
+import com.followup.backend.repository.*;
 
 import jakarta.servlet.http.HttpSession;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.transaction.Transactional;
 
 @Controller
 @RequestMapping
 public class HomeController {
 
-    @Autowired
-    CourseRepository courseRepository;
 
     @Autowired
-    AdminRepository adminRepository;
+    private AdminRepository adminRepository;
 
     @Autowired
-    FollowUpEmployeeRepository followUpEmployeeRepository;
+    private FollowUpEmployeeRepository followUpEmployeeRepository;
 
     @Autowired
-    BasicEmployeeRepository basicEmployeeRepository;
+    private BasicEmployeeRepository basicEmployeeRepository;
 
     @GetMapping("/")
     public String landingPage() {
@@ -39,64 +32,103 @@ public class HomeController {
     }
 
     @GetMapping("/login")
-    public String helloPage() {
+    public String showLoginPage() {
         return "login";
     }
 
     @PostMapping("/login")
     public String doLogin(
-        @RequestParam String email, 
-        @RequestParam String password, 
-        @RequestParam String role,
-        RedirectAttributes redirAttrs,
-        HttpSession session) {
-
-        User user = null;
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String role,
+            RedirectAttributes redirAttrs,
+            HttpSession session) {
 
         if (role.equals("ADMIN")) {
-
-            if ((user = adminRepository.findByEmailAndPassword(email, password)) != null) {
-                session.setAttribute("user", user);
+            Admin user = adminRepository.findByEmailAndPassword(email, password);
+            if (user != null) {
+                session.setAttribute("userEmail", user.getEmail());
+                session.setAttribute("userRole", user.getRole());
                 return "redirect:/adminpannel";
-            } else {
-                redirAttrs.addFlashAttribute("error", "Invalid email or password");
-                return "redirect:/login";
             }
-            
         } else {
-            if ((user = followUpEmployeeRepository.findByEmailAndPassword(email, password)) != null) {
-                session.setAttribute("user", user);
-                return "remainingfollowup";
+            FollowUpEmployee user = followUpEmployeeRepository.findByEmailAndPassword(email, password);
+            if (user != null) {
+                session.setAttribute("userEmail", user.getEmail());
+                session.setAttribute("userRole", user.getRole());
+                return "redirect:/remainingfollowup";
+            }
 
-            } else if ((user = basicEmployeeRepository.findByEmailAndPassword(email, password)) != null) {
-                session.setAttribute("user", user);
-                return "task";
-
-            } else {
-                redirAttrs.addFlashAttribute("error", "Invalid email or password");
-                return "redirect:/login";
+            BasicEmployee user1 = basicEmployeeRepository.findByEmailAndPassword(email, password);
+            if (user1 != null) {
+                session.setAttribute("userEmail", user1.getEmail());
+                session.setAttribute("userRole", user1.getRole());
+                return "redirect:/task";
             }
         }
-        
+
+        redirAttrs.addFlashAttribute("error", "Invalid email or password");
+        return "redirect:/login";
     }
-    
-    @GetMapping("/adminpannel")
-    public String adminPannel(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user != null && user.getRole().equals("ADMIN")) {
-            return "adminpannel";
-        } else {
-            System.out.println(user);
+
+    @Transactional
+    @GetMapping("/remainingfollowup")
+    public String showRemainingFollowupPage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
             return "redirect:/login";
         }
 
-        
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }        
+
+        model.addAttribute("user", user);
+        return "remainingfollowup";
+    }
+
+    @GetMapping("/adminpannel")
+    public String adminPannel(HttpSession session, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        // Optional: fetch and pass admin user if needed
+        return "adminpannel";
+    }
+
+    @GetMapping("/task")
+    public String showTaskPage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("BASIC_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        BasicEmployee user = basicEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user", user);
+        return "task";
     }
 
     @GetMapping("/data")
-    public String test() {
-        System.out.println("\n\n"+adminRepository.findAll()+"\n\n");
-        return "login";        
+    public String testData() {
+        System.out.println("\n\n" + adminRepository.findAll() + "\n\n");
+        return "login";
     }
-
 }

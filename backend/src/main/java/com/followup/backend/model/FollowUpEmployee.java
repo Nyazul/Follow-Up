@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"followUps", "department"})
 @DiscriminatorValue("FOLLOWUP_EMPLOYEE")
 public class FollowUpEmployee extends User {
 
