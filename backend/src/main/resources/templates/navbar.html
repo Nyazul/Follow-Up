@@ -3,12 +3,12 @@
 
 <body>
 
-    <div th:fragment="navbar(role)">
+    <div th:fragment="navbar(role, activePage)">
         <!-- Top Navbar (for mobile toggle) -->
         <nav class="navbar navbar-light bg-light fixed-top">
             <div class="container-fluid">
                 <button class="btn btn-outline-secondary d-md-none" type="button" id="sidebarToggle">
-                    ☰ <i class="bi bi-list"></i>
+                    <i class="bi bi-list"></i>
                 </button>
                 <span class="navbar-brand mb-0 h1" th:text="${user.name}">Username</span>
             </div>
@@ -48,8 +48,9 @@
                     </h2>
                     <div id="followUpCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
                         <div class="accordion-body p-0">
-                            <a href="#" class="nav-link ps-5">Remaining</a>
-                            <a href="#" class="nav-link ps-5">Completed</a>
+                            <a th:href="@{/remaining-followup}" class="nav-link ps-5" th:classappend="${activePage} == remaining ? 'active' : ''">Remaining</a>
+                            <a th:href="@{/completed-followup}" class="nav-link ps-5" th:classappend="${activePage} == completed ? 'active' : ''">Completed</a>
+                            <a th:href="@{/new-followup}" class="nav-link ps-5" th:classappend="${activePage} == new-followup ? 'active' : ''">New Follow-Up</a>
                         </div>
                     </div>
                 </div>

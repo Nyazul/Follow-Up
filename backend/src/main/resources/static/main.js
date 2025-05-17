@@ -15,6 +15,10 @@ function loadPage(url) {
         });
 }
 
+function handleDateChange(value) {
+    document.querySelector('.timeline-date-box').innerHTML = value;
+}
+
 // Function to handle the sidebar toggle
 
 document.addEventListener('DOMContentLoaded', function () {
