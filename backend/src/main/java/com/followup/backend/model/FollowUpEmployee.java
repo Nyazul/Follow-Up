@@ -1,5 +1,6 @@
 package com.followup.backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -18,7 +19,7 @@ public class FollowUpEmployee extends User {
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<FollowUp> followUps;
+    private List<FollowUp> followUps = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = true)

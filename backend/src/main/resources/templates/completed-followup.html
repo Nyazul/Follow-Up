@@ -15,10 +15,16 @@
   <!-- Navbar -->
 
   <div th:replace="~{/navbar :: navbar('ADMIN', 'completed')}"></div>
-  
+
 
   <div class="content">
-    
+
+    <div th:if="*{message!=null and #strings.length(message)>0}"
+      class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder" th:text="${message}"></div>
+
+    <div th:if="*{error!=null and #strings.length(error)>0}"
+      class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
+
     <!-- Section Title -->
     <div class="section-title">Completed Follow-up</div>
 
@@ -30,12 +36,13 @@
       </div>
 
       <!-- Lead Cards -->
-      <div class="lead-card" th:each="followUp : ${user.completedFollowUps}">
+      <div class="lead-card" th:each="followUp : ${user.completedFollowUps}"  th:attr="data-id=${followUp.id}">
         <div class="lead-info">
           <div class="lead-icon">👤</div>
           <div class="lead-text">
             <div class="lead-title" th:text="${followUp.lead.name}">Lead 1</div>
-            <div><strong>Last Follow Up:</strong><span th:utext="${followUp.recentNodeTitleAndBody}"> Here will be the detail of the most recent follow up</span></div>
+            <div><strong>Last Follow Up:</strong><span th:utext="${followUp.recentNodeTitleAndBody}"> Here will be the
+                detail of the most recent follow up</span></div>
             <div><strong>Course:</strong><Span th:text="${followUp.course.name}">BSc Computer Science</Span></div>
             <div><strong>Department:</strong><span th:text="${followUp.course.department.name}">Science</span></div>
             <div><strong>Mobile:</strong><span th:text="${followUp.lead.phoneNumber}">8551055201</span></div>
@@ -46,10 +53,23 @@
         <div class="arrow-btn">➤</div>
       </div>
 
-    </div>
+      <!-- Click Redirect Script -->
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const leadCards = document.querySelectorAll(".lead-card");
 
-    <!-- Add Button -->
-    <button class="add-btn">+</button>
+          leadCards.forEach(card => {
+            card.addEventListener("click", function () {
+              const followUpId = this.getAttribute("data-id");
+              if (followUpId) {
+                window.location.href = `/completed-followup/${followUpId}`;
+              }
+            });
+          });
+        });
+      </script>
+
+    </div>
 
   </div>
 

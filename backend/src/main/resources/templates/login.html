@@ -31,8 +31,12 @@
 
 <div class="login-container">
 
-  <div th:if="*{error!=null and #strings.length(error)>0}" class="alert text-danger text-center" th:text="${error}"></div>
+  <div th:if="*{message!=null and #strings.length(message)>0}"
+    class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder" th:text="${message}"></div>
 
+  <div th:if="*{error!=null and #strings.length(error)>0}"
+    class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
+    
   <h4 class="text-center mb-4">Welcome! Please log in</h4>
 
   <div class="dropdown text-center mb-4">

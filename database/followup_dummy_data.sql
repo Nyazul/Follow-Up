@@ -20,10 +20,10 @@ INSERT INTO `user` (id, name, email, password, phone_number, address, created_at
 (1, 'Nyazul Ansari', 'ansarinyazul2003@gmail.com', 'nyaz@inny', '8551055201', 'Ozar, Nashik', NOW(), NOW(), FALSE, 'ADMIN', TRUE, NULL),
 (2, 'Alan Admin', 'alan.admin@example.com', 'admin123', '9999999992', 'Admin Lane 2', NOW(), NOW(), FALSE, 'ADMIN', FALSE, NULL),
 (3, 'Amy Admin', 'amy.admin@example.com', 'admin123', '9999999993', 'Admin Lane 3', NOW(), NOW(), FALSE, 'ADMIN', FALSE, NULL),
-(4, 'Ben Basic', 'ben.basic@example.com', 'basic123', '8888888881', 'Basic Street 1', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
+(4, 'Devyani Nagare', 'devyaninagare07@gmail.com', 'devyani123', '8888888881', 'Basic Street 1', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
 (5, 'Beth Basic', 'beth.basic@example.com', 'basic123', '8888888882', 'Basic Street 2', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
 (6, 'Bill Basic', 'bill.basic@example.com', 'basic123', '8888888883', 'Basic Street 3', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
-(7, 'Eve Followup', 'eve.emp@example.com', 'follow123', '7777777771', 'Emp Road 1', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1),
+(7, 'Anjali Paga', 'anjalisp123@gmail.com', 'anjali123', '7777777771', 'Emp Road 1', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1),
 (8, 'Ed Followup', 'ed.emp@example.com', 'follow123', '7777777772', 'Emp Road 2', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 2),
 (9, 'Ella Followup', 'ella.emp@example.com', 'follow123', '7777777773', 'Emp Road 3', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1);
 

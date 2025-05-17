@@ -1,6 +1,11 @@
 package com.followup.backend.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.followup.backend.dto.AddFollowUpFormDTO;
 import com.followup.backend.dto.CourseDTO;
 import com.followup.backend.dto.DepartmentDTO;
+import com.followup.backend.dto.NewFollowUpFormDTO;
 import com.followup.backend.model.*;
 import com.followup.backend.repository.*;
 
@@ -30,6 +37,9 @@ public class HomeController {
     private FollowUpRepository followUpRepository;
 
     @Autowired
+    private FollowUpNodeRepository followUpNodeRepository;
+
+    @Autowired
     private BasicEmployeeRepository basicEmployeeRepository;
 
     @Autowired
@@ -37,6 +47,9 @@ public class HomeController {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private LeadRepository leadRepository;
 
     @GetMapping("/")
     public String landingPage() {
@@ -151,15 +164,86 @@ public class HomeController {
                 .map(c -> new CourseDTO(c.getCode(), c.getName(), c.getDepartment().getId()))
                 .toList();
 
+        NewFollowUpFormDTO newFollowUpForm = new NewFollowUpFormDTO();
+
         model.addAttribute("user", user);
         model.addAttribute("departments", departments);
         model.addAttribute("courses", courses);
+        model.addAttribute("newFollowUpForm", newFollowUpForm);
         return "new-followup";
     }
-    
+
+    @PostMapping("/new-followup")
+    public String createNewFollowup(
+            @ModelAttribute("newFollowUpForm") NewFollowUpFormDTO newFollowUpForm,
+            RedirectAttributes redirAttrs,
+            HttpSession session) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+        LocalDate date = LocalDate.parse(newFollowUpForm.getFollowUpDate(), formatter);
+
+        if (date.isBefore(LocalDate.now())) {
+            redirAttrs.addFlashAttribute("error", "Date cannot be in the past");
+            return "redirect:/new-followup";
+        }
+
+        Lead lead = new Lead();
+        lead.setName(newFollowUpForm.getLeadName());
+        lead.setEmail(newFollowUpForm.getEmail());
+        lead.setPhoneNumber(newFollowUpForm.getMobile());
+        lead.setAddress(newFollowUpForm.getAddress());
+        lead.setDeleted(false);
+        lead.setCreatedAt(LocalDateTime.now());
+        lead.setUpdatedAt(LocalDateTime.now());
+        lead = leadRepository.save(lead);
+
+        FollowUp followUp = new FollowUp();
+        followUp.setLead(lead);
+        followUp.setDescription(newFollowUpForm.getFollowUpDescription());
+        followUp.setStatus(FollowUp.Status.PENDING);
+        followUp.setDueDate(LocalDateTime.now());
+        followUp.setCreatedAt(LocalDateTime.now());
+        followUp.setUpdatedAt(LocalDateTime.now());
+        followUp.setDeleted(false);
+        followUp.setCourse(courseRepository.findById(newFollowUpForm.getCourseCode()).orElse(null));
+        followUp.setEmployee(user);
+        followUp = followUpRepository.save(followUp);
+
+        FollowUpNode followUpNode = new FollowUpNode();
+        followUpNode.setTitle(newFollowUpForm.getFollowUpTitle());
+        followUpNode.setBody(newFollowUpForm.getFollowUpDescription());
+        
+
+        followUpNode.setDate(date.atStartOfDay());
+        followUpNode.setDoneBy(user);
+        followUpNode.setCreatedAt(LocalDateTime.now());
+        followUpNode.setFollowUp(followUp);
+        followUpNode = followUpNodeRepository.save(followUpNode);
+        followUp.getNodes().add(followUpNode);
+        followUpRepository.save(followUp);
+        leadRepository.save(lead);
+
+        redirAttrs.addFlashAttribute("message", "Follow-up created successfully");
+        return "redirect:/remaining-followup";
+    }
 
     @GetMapping("/remaining-followup/{id}")
-    public String showFollowUpDetails(@PathVariable Long id, Model model, HttpSession session, RedirectAttributes redirAttrs) {
+    public String showFollowUpDetails(@PathVariable Long id, Model model, HttpSession session,
+            RedirectAttributes redirAttrs) {
 
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
@@ -186,6 +270,155 @@ public class HomeController {
         model.addAttribute("user", user);
 
         return "remaining-followup-details"; // your view name
+    }
+
+    @GetMapping("/remaining-followup/{id}/mark-complete")
+    public String markFollowUpComplete(@PathVariable Long id, RedirectAttributes redirAttrs, HttpSession session) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        FollowUp followUp = followUpRepository.findById(id).orElse(null);
+        if (followUp == null) {
+            redirAttrs.addFlashAttribute("error", "Follow-up not found");
+            return "redirect:/remaining-followup";
+        }
+
+        followUp.setStatus(FollowUp.Status.COMPLETED);
+        followUp.setUpdatedAt(LocalDateTime.now());
+        followUp.setDeleted(false);
+        followUp.setEmployee(user);
+
+        followUpRepository.save(followUp); // ✅ only need to update the follow-up
+        redirAttrs.addFlashAttribute("message", "Follow-up marked as completed");
+
+        return "redirect:/remaining-followup";
+    }
+
+    @GetMapping("/remaining-followup/{id}/add-followup")
+    public String showAddFollowUpNodePage(@PathVariable Long id, Model model, HttpSession session,
+            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        FollowUp followUp = followUpRepository.findById(id).orElse(null);
+        if (followUp == null) {
+            redirAttrs.addFlashAttribute("error", "Follow-up not found");
+            return "redirect:/remaining-followup";
+        }
+
+        AddFollowUpFormDTO addFollowUpForm = new AddFollowUpFormDTO();
+
+        model.addAttribute("user", user);
+        model.addAttribute("followUp", followUp);
+        model.addAttribute("addFollowUpForm", addFollowUpForm);
+
+        return "add-followup";
+    }
+
+    @PostMapping("/remaining-followup/{id}/add-followup")
+    public String addFollowUpNode(
+            @PathVariable Long id,
+            @ModelAttribute("addFollowUpForm") AddFollowUpFormDTO addFollowUpForm,
+            RedirectAttributes redirAttrs,
+            HttpSession session) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        FollowUp followUp = followUpRepository.findById(id).orElse(null);
+        if (followUp == null) {
+            redirAttrs.addFlashAttribute("error", "Follow-up not found");
+            return "redirect:/remaining-followup";
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+        LocalDate date = LocalDate.parse(addFollowUpForm.getDate(), formatter);
+
+        if (date.isBefore(LocalDate.now())) {
+            redirAttrs.addFlashAttribute("error", "Date cannot be in the past");
+            return "redirect:/remaining-followup/" + id + "/add-followup";
+        }
+
+        FollowUpNode followUpNode = new FollowUpNode();
+        followUpNode.setTitle(addFollowUpForm.getTitle());
+        followUpNode.setBody(addFollowUpForm.getDescription());
+
+        followUpNode.setDate(date.atStartOfDay());
+        followUpNode.setDoneBy(user);
+        followUpNode.setCreatedAt(LocalDateTime.now());
+        followUpNode.setFollowUp(followUp);
+        followUpNode = followUpNodeRepository.save(followUpNode);
+
+        followUp.getNodes().add(followUpNode);
+        followUpRepository.save(followUp);
+
+        redirAttrs.addFlashAttribute("message", "Follow-up node added successfully");
+        return "redirect:/remaining-followup/" + id;
+    }
+
+    @GetMapping("/completed-followup/{id}")
+    public String showCFollowUpDetails(@PathVariable Long id, Model model, HttpSession session,
+            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || !role.equals("FOLLOWUP_EMPLOYEE")) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        try {
+            FollowUp followUp = followUpRepository.findById(id).orElseThrow(() -> new Exception("FollowUp not found"));
+            model.addAttribute("followUp", followUp);
+        } catch (Exception e) {
+            redirAttrs.addFlashAttribute("message", "FollowUp not found");
+            return "redirect:/completed-followup";
+        }
+
+        model.addAttribute("user", user);
+
+        return "completed-followup-details";
     }
 
     @GetMapping("/admin-pannel")

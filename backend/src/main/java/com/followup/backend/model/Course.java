@@ -1,6 +1,7 @@
 package com.followup.backend.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,7 +42,7 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<FollowUp> followUps;
+    private List<FollowUp> followUps = new ArrayList<>();
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
