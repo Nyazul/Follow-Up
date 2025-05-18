@@ -3,7 +3,6 @@ package com.followup.backend.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -226,7 +225,6 @@ public class HomeController {
         FollowUpNode followUpNode = new FollowUpNode();
         followUpNode.setTitle(newFollowUpForm.getFollowUpTitle());
         followUpNode.setBody(newFollowUpForm.getFollowUpDescription());
-        
 
         followUpNode.setDate(date.atStartOfDay());
         followUpNode.setDoneBy(user);
@@ -365,8 +363,19 @@ public class HomeController {
             return "redirect:/remaining-followup";
         }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
-        LocalDate date = LocalDate.parse(addFollowUpForm.getDate(), formatter);
+        LocalDate date = null;
+
+        String rawDate = addFollowUpForm.getDate(); // e.g., "20 MAY 2025"
+        String[] parts = rawDate.split(" ");
+        if (parts.length == 3) {
+            String day = parts[0];
+            String month = parts[1].substring(0, 1).toUpperCase() + parts[1].substring(1).toLowerCase(); // MAY -> May
+            String year = parts[2];
+            String normalizedDate = day + " " + month + " " + year;
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+            date = LocalDate.parse(normalizedDate, formatter);
+        }
 
         if (date.isBefore(LocalDate.now())) {
             redirAttrs.addFlashAttribute("error", "Date cannot be in the past");

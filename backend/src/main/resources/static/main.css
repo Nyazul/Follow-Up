@@ -27,8 +27,10 @@
 
 .content {
     margin-left: 250px;
-    padding: 2rem;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease-in-out;
 }
+
 
 @media (max-width: 768px) {
     .sidebar {
@@ -43,6 +45,7 @@
         margin-top: 20px;
         margin-left: 0;
     }
+
 }
 
 .accordion-button {

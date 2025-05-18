@@ -24,14 +24,8 @@
     <div th:if="*{error!=null and #strings.length(error)>0}"
       class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
 
-    <!-- Section Title -->
-    <div class="section-title">Follow-Up Details</div>
-
-    <div class="container bg-white rounded shadow p-4 mb-5">
+    <div class="container bg-white rounded shadow p-4 mb-1">
       <div class="row mb-3 align-items-center">
-        <div class="col-auto">
-          <div class="lead-icon">👤</div>
-        </div>
         <div class="col-md-3">
           <p><strong>Lead Name : </strong><span th:text="${followUp.lead.name}">Nyaz Ansari</span></p>
         </div>
@@ -40,14 +34,7 @@
               th:text="${followUp.dueDate != null ? #temporals.format(followUp.dueDate, 'dd MMM yyyy HH:mm') : 'No Date'}">19
               May 2025 02:42</span></p>
         </div>
-        <div class="col text-end">
-          <a class="btn btn-info w-50 mb-2"
-            th:href="@{/remaining-followup/{id}/mark-complete(id=${followUp.id})}"><strong>Mark complete ✅</strong></a>
-          <a class="btn btn-warning w-50 mb-2" th:href="@{/remaining-followup}"><strong>Edit details ✏️</strong></a>
-          <a class="btn btn-dark w-50" th:href="@{/remaining-followup/{id}/add-followup(id=${followUp.id})}"><strong>Add Follow-Up ➕</strong></a>
-
-        </div>
-
+        
       </div>
 
 
@@ -74,12 +61,26 @@
           <p><strong>Address : </strong><span th:text="${followUp.lead.address}">Ozar, Nashik</span></p>
         </div>
       </div>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-md-4">
+          <a class="btn btn-info w-100 mb-2"
+            th:href="@{/remaining-followup/{id}/mark-complete(id=${followUp.id})}"><strong>Mark complete ✅</strong></a>
+        </div>
+        <div class="col-md-4">
+          <a class="btn btn-warning w-100 mb-2" th:href="@{/remaining-followup}"><strong>Edit details ✏️</strong></a>
+
+        </div>
+        <div class="col-md-4">
+          <a class="btn btn-dark w-100" th:href="@{/remaining-followup/{id}/add-followup(id=${followUp.id})}"><strong>Add Follow-Up ➕</strong></a>
+
+        </div>
+
+      </div>
     </div>
 
-    <div class="section-title">Timeline</div>
-
     <!-- Timeline -->
-    <div class="timeline-container mt-4 p-3 rounded container bg-white shadow mb-5">
+    <div class="timeline-container mt-2 p-3 rounded container bg-white shadow mb-5">
       <div class="timeline-line">
 
         <div class="timeline-entry d-flex" th:each="node : ${followUp.nodes}">

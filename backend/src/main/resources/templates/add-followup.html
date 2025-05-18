@@ -24,17 +24,14 @@
         <div th:if="*{error!=null and #strings.length(error)>0}"
             class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
 
-        <!-- Section Title -->
-        <div class="section-title">Follow-Up Details</div>
+
         <form class="form-section" th:action="@{/remaining-followup/{id}/add-followup(id=${followUp.id})}"
             th:object="${addFollowUpForm}" method="post">
 
 
-            <div class="container bg-white rounded shadow p-4 mb-5">
+            <div class="container bg-white rounded shadow p-4 mb-1">
                 <div class="row mb-3 align-items-center">
-                    <div class="col-auto">
-                        <div class="lead-icon">👤</div>
-                    </div>
+
                     <div class="col-md-3">
                         <p><strong>Lead Name : </strong><span th:text="${followUp.lead.name}">Nyaz Ansari</span></p>
                     </div>
@@ -42,12 +39,6 @@
                         <p><strong>Next Follow-Up : </strong><span
                                 th:text="${followUp.dueDate != null ? #temporals.format(followUp.dueDate, 'dd MMM yyyy HH:mm') : 'No Date'}">19
                                 May 2025 02:42</span></p>
-                    </div>
-                    <div class="col text-end">
-                        <input type="submit" value="Add Follow-Up ✅" class="btn btn-primary w-50 mb-2 fw-bolder">
-                        <a class="btn btn-warning w-50 mb-2"
-                            th:href="@{/remaining-followup/{id}(id=${followUp.id})}"><strong>Cancel
-                                ❌</strong></a>
                     </div>
 
                 </div>
@@ -79,6 +70,7 @@
                         <p><strong>Address : </strong><span th:text="${followUp.lead.address}">Ozar, Nashik</span></p>
                     </div>
                 </div>
+
             </div>
 
             <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -115,7 +107,7 @@
 
             <div class="section-title">Timeline</div>
 
-            <div class="timeline-container mt-4 p-3 rounded container bg-white shadow mb-5">
+            <div class="timeline-container mt-4 py-3 rounded container bg-white shadow mb-5">
                 <div class="timeline-line">
 
                     <div class="timeline-entry d-flex">
@@ -128,20 +120,46 @@
                             th:classappend="${#fields.hasErrors('date')} ? 'is-invalid'" required>
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
 
-                        <div class="d-flex">
-                            <input type="text" th:field="*{title}" class="form-control" style="width: 20vw;"
-                                placeholder="Title" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
-                                required>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
-                            </div>
-
-                            <input type="text" th:field="*{description}" class="form-control mx-3"
+                        <input type="text" th:field="*{title}" class="form-control" style="width: 20vw;"
+                            placeholder="Title" th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'" required>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" th:field="*{description}" class="form-control mx-3 w-75"
                                 placeholder="Description"
                                 th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}"
-                                th:errors="*{description}"></div>
+                                th:errors="*{description}">
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <div class="row mb-3">
+                                <div class="col-auto">
+                                    <input type="submit" value="Add ✅" class="btn btn-primary w-100 fw-bolder">
+                                </div>
+                                <div class="col-auto px-0">
+                                    <a class="btn btn-warning w-100"
+                                        th:href="@{/remaining-followup/{id}(id=${followUp.id})}"><strong>Cancel
+                                            ❌</strong></a>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
+                    <div class="timeline-entry d-flex" th:each="node : ${followUp.nodes}">
+                        <div class="timeline-date-box">
+                          <span th:text="${#temporals.format(node.date, 'dd')}">date</span> <br> <span
+                            th:text="${#temporals.format(followUp.dueDate, 'MMM')}">month</span>
+                        </div>
+                        <div class="d-flex">
+                          <strong class="text-primary" th:text="${node.title}">Title</strong><strong>&nbsp;&nbsp; :
+                            &nbsp;&nbsp;</strong>
+                          <p th:text="${node.body}">Description</p>
+                        </div>
+              
+                      </div>
 
                 </div>
             </div>

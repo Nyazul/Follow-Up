@@ -18,24 +18,16 @@
 
   <div class="content">
 
-    <!-- Section Title -->
-    <div class="section-title">Follow-Up Details</div>
 
     <div class="container bg-white rounded shadow p-4 mb-5">
       <div class="row mb-3 align-items-center">
-        <div class="col-auto">
-          <div class="lead-icon">👤</div>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           <p><strong>Lead Name : </strong><span th:text="${followUp.lead.name}">Nyaz Ansari</span></p>
         </div>
         <div class="col-md-4">
           <p><strong>Last Follow-Up : </strong><span
               th:text="${followUp.dueDate != null ? #temporals.format(followUp.dueDate, 'dd MMM yyyy HH:mm') : 'No Date'}">19
               May 2025 02:42</span></p>
-        </div>
-        <div class="col text-end">
-          <a class="btn btn-warning w-50 mb-2" th:href="@{/remaining-followup}"><strong>Edit details ✏️</strong></a>
         </div>
 
       </div>
