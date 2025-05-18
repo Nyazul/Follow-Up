@@ -19,6 +19,7 @@ import lombok.ToString;
 @Setter
 @ToString(exclude = {"tasks"})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "app_user")
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 public abstract class User {
     @Id
