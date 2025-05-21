@@ -22,7 +22,7 @@ INSERT INTO "app_user" (id, name, email, password, phone_number, address, create
 (4, 'Devyani Nagare', 'devyaninagare07@gmail.com', 'devyani123', '8888888881', 'Basic Street 1', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
 (5, 'Beth Basic', 'beth.basic@example.com', 'basic123', '8888888882', 'Basic Street 2', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
 (6, 'Bill Basic', 'bill.basic@example.com', 'basic123', '8888888883', 'Basic Street 3', NOW(), NOW(), FALSE, 'BASIC_EMPLOYEE', FALSE, NULL),
-(7, 'Anjali Paga', 'anjalisp125@gmail.com', 'anjali123', '7777777771', 'Emp Road 1', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1),
+(7, 'Anjali Pagar', 'anjalisp125@gmail.com', 'anjali123', '7777777771', 'Emp Road 1', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1),
 (8, 'Ed Followup', 'ed.emp@example.com', 'follow123', '7777777772', 'Emp Road 2', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 2),
 (9, 'Ella Followup', 'ella.emp@example.com', 'follow123', '7777777773', 'Emp Road 3', NOW(), NOW(), FALSE, 'FOLLOWUP_EMPLOYEE', FALSE, 1);
 

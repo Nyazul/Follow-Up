@@ -82,7 +82,8 @@
                     $('#timelineDateInput').datepicker({
                         format: 'dd M yyyy',  // full format including year
                         autoclose: true,
-                        todayHighlight: true
+                        todayHighlight: true,
+                        startDate: new Date()  // Disable past dates
                     }).on('changeDate', function (e) {
                         let day = e.date.getDate().toString().padStart(2, '0');
                         let month = e.date.toLocaleString('default', { month: 'short' }).toUpperCase();

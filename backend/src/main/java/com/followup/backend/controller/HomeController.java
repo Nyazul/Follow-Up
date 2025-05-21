@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.followup.backend.dto.AddFollowUpFormDTO;
 import com.followup.backend.dto.CourseDTO;
 import com.followup.backend.dto.DepartmentDTO;
+import com.followup.backend.dto.EmployeeSummaryDTO;
+import com.followup.backend.dto.FollowUpTrendDTO;
 import com.followup.backend.dto.NewFollowUpFormDTO;
 import com.followup.backend.model.*;
 import com.followup.backend.repository.*;
@@ -259,6 +261,10 @@ public class HomeController {
 
         try {
             FollowUp followUp = followUpRepository.findById(id).orElseThrow(() -> new Exception("FollowUp not found"));
+
+            followUp.getNodes().sort((n1, n2) -> n2.getDate().compareTo(n1.getDate()));
+
+
             model.addAttribute("followUp", followUp);
         } catch (Exception e) {
             redirAttrs.addFlashAttribute("message", "FollowUp not found");
@@ -372,6 +378,7 @@ public class HomeController {
             String month = parts[1].substring(0, 1).toUpperCase() + parts[1].substring(1).toLowerCase(); // MAY -> May
             String year = parts[2];
             String normalizedDate = day + " " + month + " " + year;
+            System.out.println("Normalized date: " + normalizedDate);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
             date = LocalDate.parse(normalizedDate, formatter);
@@ -386,6 +393,7 @@ public class HomeController {
         followUpNode.setTitle(addFollowUpForm.getTitle());
         followUpNode.setBody(addFollowUpForm.getDescription());
 
+        System.out.println("Date: " + date);
         followUpNode.setDate(date.atStartOfDay());
         followUpNode.setDoneBy(user);
         followUpNode.setCreatedAt(LocalDateTime.now());
@@ -393,6 +401,8 @@ public class HomeController {
         followUpNode = followUpNodeRepository.save(followUpNode);
 
         followUp.getNodes().add(followUpNode);
+        followUp.setUpdatedAt(LocalDateTime.now());
+        followUp.setDueDate(date.atStartOfDay());
         followUpRepository.save(followUp);
 
         redirAttrs.addFlashAttribute("message", "Follow-up node added successfully");
@@ -469,4 +479,76 @@ public class HomeController {
         System.out.println("\n\n" + adminRepository.findAll() + "\n\n");
         return "login";
     }
+
+    @GetMapping("/report")
+    public String showReportPage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        List<CourseDTO> courses = courseRepository.findAll()
+                .stream()
+                .map(c -> new CourseDTO(c.getCode(), c.getName(), c.getDepartment().getId()))
+                .toList();
+
+        
+        List<FollowUp> last12MonthsFollowUps = followUpRepository.findByCreatedAtAfter(LocalDate.now().minusMonths(12).atStartOfDay());
+
+        List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
+
+        List<EmployeeSummaryDTO> employeeSummaries = employees.stream()
+                .map(e -> {
+                    long todayCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                            .count();
+
+                    long weeklyCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusDays(6)))
+                            .count();
+
+                    long monthlyCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusDays(30)))
+                            .count();
+
+                    return new EmployeeSummaryDTO(
+                            e.getId(),
+                            e.getName(),
+                            e.getDepartment() != null ? e.getDepartment().getName() : "N/A",
+                            todayCount,
+                            weeklyCount,
+                            monthlyCount,
+                            e.getDepartment() != null ? e.getDepartment().getId() : null);
+                })
+                .toList();
+
+        List<FollowUpTrendDTO> followUpTrends = last12MonthsFollowUps.stream()
+                .map(f -> new FollowUpTrendDTO(
+                        f.getCreatedAt().toLocalDate(),
+                        f.getStatus() == FollowUp.Status.COMPLETED ? 1 : 0))
+                .toList();
+
+        model.addAttribute("employeeSummaries", employeeSummaries);
+        model.addAttribute("followUpTrends", followUpTrends);
+        model.addAttribute("departments", departments);
+        model.addAttribute("courses", courses);
+        model.addAttribute("user", user);
+
+        return "report-dashboard";
+    }
+
 }

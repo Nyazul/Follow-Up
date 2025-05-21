@@ -9,4 +9,6 @@ import com.followup.backend.model.Admin;
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     Admin findByEmailAndPassword(String email, String password);
+
+    Admin findByEmail(String email);
 }

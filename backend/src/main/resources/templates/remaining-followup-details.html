@@ -26,7 +26,7 @@
 
     <div class="container bg-white rounded shadow p-4 mb-1">
       <div class="row mb-3 align-items-center">
-        <div class="col-md-3">
+        <div class="col-md-4">
           <p><strong>Lead Name : </strong><span th:text="${followUp.lead.name}">Nyaz Ansari</span></p>
         </div>
         <div class="col-md-4">
@@ -86,7 +86,7 @@
         <div class="timeline-entry d-flex" th:each="node : ${followUp.nodes}">
           <div class="timeline-date-box">
             <span th:text="${#temporals.format(node.date, 'dd')}">date</span> <br> <span
-              th:text="${#temporals.format(followUp.dueDate, 'MMM')}">month</span>
+              th:text="${#temporals.format(node.date, 'MMM')}">month</span>
           </div>
           <div class="d-flex">
             <strong class="text-primary" th:text="${node.title}">Title</strong><strong>&nbsp;&nbsp; :
