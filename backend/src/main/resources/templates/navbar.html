@@ -20,19 +20,25 @@
             <div class="accordion" id="adminSidebar">
 
                 <!-- Master -->
-                <div class="accordion-item border-0">
+                <div th:if="${role} == ADMIN" class="accordion-item border-0">
                     <h2 class="accordion-header" id="masterHeading">
-                        <button class="accordion-button collapsed d-flex justify-content-between align-items-center"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#masterCollapse">
+                        <button class="accordion-button d-flex justify-content-between align-items-center"
+                        th:classappend="${activePage} != 'master-course' and ${activePage} != 'master-department' and ${activePage} != 'master-employee' ? 'collapse' : ''"
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#masterCollapse">
                             <span><i class="bi bi-gear me-2"></i> Master</span>
 
                         </button>
                     </h2>
-                    <div id="masterCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
+                    <div id="masterCollapse" 
+                        th:classappend="${role} == 'ADMIN' ? 'show' : ''"
+                        class="accordion-collapse collapse" 
+                        data-bs-parent="#adminSidebar">
                         <div class="accordion-body p-0">
-                            <a href="Course.html" class="nav-link ps-5">Course</a>
-                            <a href="dept1.html" class="nav-link ps-5">Department</a>
-                            <a href="addcourse.html" class="nav-link ps-5">Employee</a>
+                            <a href="Course.html" class="nav-link ps-5" th:classappend="${activePage} == master-course ? 'active' : ''">Course</a>
+                            <a href="dept1.html" class="nav-link ps-5" th:classappend="${activePage} == master-department ? 'active' : ''">Department</a>
+                            <a href="addcourse.html" class="nav-link ps-5" th:classappend="${activePage} == master-employee ? 'active' : ''">Employee</a>
                         </div>
                     </div>
                 </div>
@@ -41,12 +47,16 @@
                 <!-- Follow Up -->
                 <div class="accordion-item border-0">
                     <h2 class="accordion-header" id="followUpHeading">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        <button class="accordion-button"
+                            th:classappend="${activePage} != 'remaining' and ${activePage} != 'completed' and ${activePage} != 'new-followup' ? 'collapse' : ''" 
+                            type="button" data-bs-toggle="collapse"
                             data-bs-target="#followUpCollapse">
                             <i class="bi bi-clipboard2-check me-2"></i> Follow Up
                         </button>
                     </h2>
-                    <div id="followUpCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
+                    <div id="followUpCollapse" class="accordion-collapse collapse" 
+                        th:classappend="${role} == 'FOLLOWUP-EMPLOYEE' ? 'show' : ''"
+                        data-bs-parent="#adminSidebar">
                         <div class="accordion-body p-0">
                             <a th:href="@{/remaining-followup}" class="nav-link ps-5" th:classappend="${activePage} == remaining ? 'active' : ''">Remaining</a>
                             <a th:href="@{/completed-followup}" class="nav-link ps-5" th:classappend="${activePage} == completed ? 'active' : ''">Completed</a>
@@ -55,27 +65,11 @@
                     </div>
                 </div>
 
-                <a href="#" class="nav-link px-3"><i class="bi bi-check2-square me-2"></i> Task</a>
+                <a th:href="@{/task}" class="nav-link px-3" th:classappend="${activePage} == task ? 'active' : ''"><i class="bi bi-check2-square me-2"></i> Task</a>
 
-                <!-- Report -->
-                <div class="accordion-item border-0">
-                    <h2 class="accordion-header" id="reportHeading">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#reportCollapse">
-                            <i class="bi bi-bar-chart-line me-2"></i> Report
-                        </button>
-                    </h2>
-                    <div id="reportCollapse" class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
-                        <div class="accordion-body p-0">
-                            <a href="#" class="nav-link ps-5">Daily</a>
-                            <a href="#" class="nav-link ps-5">Weekly</a>
-                            <a href="#" class="nav-link ps-5">Monthly</a>
-                            <a href="#" class="nav-link ps-5">Yearly</a>
-                        </div>
-                    </div>
-                </div>
+                <a th:href="@{/report}" th:if="${role} == ADMIN" class="nav-link px-3" th:classappend="${activePage} == report ? 'active' : ''"><i class="bi bi-bar-chart-line me-2"></i> Report</a>
 
-                <a href="#" class="nav-link px-3"><i class="bi bi-kanban me-2"></i> Task Management</a>
+                <a th:href="@{/task-management}" th:if="${role} == ADMIN" class="nav-link px-3" th:classappend="${activePage} == task-management ? 'active' : ''"><i class="bi bi-kanban me-2"></i> Task Management</a>
 
 
             </div>
