@@ -555,7 +555,7 @@ public class HomeController {
     }
 
     @GetMapping("/master/course")
-    public String getMasterCoursePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+    public String showMasterCoursePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
         
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
