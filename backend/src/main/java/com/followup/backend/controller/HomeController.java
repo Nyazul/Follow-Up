@@ -576,6 +576,29 @@ public class HomeController {
         return "add-course";
 
     }
+
+    @GetMapping("/master/department")
+    public String showMasterDepartmentPage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+        
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+        
+        model.addAttribute("user", user);
+
+        return "add-department";
+
+    }
     
 
 }

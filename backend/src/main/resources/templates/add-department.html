@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Add Department</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <title>Master Department</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/main.css}">
 </head>
+
 <body class="bg-light p-4">
+
+  <div th:replace="~{/navbar :: navbar('ADMIN', 'master-department')}"></div>
+  <div class="content">
   <div class="container bg-white rounded shadow p-4 mb-5">
     <div class="col-md-2 d-flex align-items-center mb-3">
       <span class="profile-img me-2"></span>
@@ -15,7 +21,7 @@
     </div>
 
     <!-- Form -->
-    <form id="departmentForm">
+    <form action="/department/add" method="post">
       <div class="row mb-3">
         <div class="col-md-6">
           <label class="form-label"><i class="bi bi-person-fill"></i> Department Name</label>
@@ -25,13 +31,13 @@
 
       <div class="d-flex justify-content-center mt-4">
         <button type="submit" style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button>
-    
-      </div>  
+
+      </div>
     </form>
 
     <!-- Displayed Departments -->
     <div id="departmentList" class="mt-5">
-      
+
       <ul class="list-group" id="listContainer"></ul>
     </div>
   </div>
@@ -42,7 +48,7 @@
     const input = document.getElementById("departmentInput");
     const list = document.getElementById("listContainer");
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function (e) {
       e.preventDefault(); // Prevent page reload
 
       const deptName = input.value.trim();
@@ -59,5 +65,9 @@
       document.getElementById("departmentForm").reset();
     }
   </script>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/main.js}"></script>
 </body>
+
 </html>

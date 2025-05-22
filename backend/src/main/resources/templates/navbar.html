@@ -32,11 +32,11 @@
                     <div id="masterCollapse" th:classappend="${role} == 'ADMIN' ? 'show' : ''"
                         class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
                         <div class="accordion-body p-0">
-                            <a href="Course.html" class="nav-link ps-5"
+                            <a th:href="@{/master/course}" class="nav-link ps-5"
                                 th:classappend="${activePage} == master-course ? 'active' : ''">Course</a>
-                            <a href="dept1.html" class="nav-link ps-5"
+                            <a th:href="@{/master/department}" class="nav-link ps-5"
                                 th:classappend="${activePage} == master-department ? 'active' : ''">Department</a>
-                            <a href="addcourse.html" class="nav-link ps-5"
+                            <a th:href="@{/master/employee}" class="nav-link ps-5"
                                 th:classappend="${activePage} == master-employee ? 'active' : ''">Employee</a>
                         </div>
                     </div>
