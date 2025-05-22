@@ -15,7 +15,7 @@
 <body class="d-flex flex-column min-vh-100">
   <!-- Navbar -->
 
-  <div th:replace="~{/navbar :: navbar('FOLLOWUP-EMPLOYEE', 'remaining')}"></div>
+  <div th:replace="~{/navbar :: navbar('FOLLOWUP_EMPLOYEE', 'remaining')}"></div>
 
 
   <div class="content">
@@ -37,7 +37,7 @@
       </div>
 
       <!-- Lead Cards -->
-      <div class="lead-card" th:each="followUp : ${user.remainingFollowUps}" th:attr="data-id=${followUp.id}">
+      <div class="lead-card hover-effect" th:each="followUp : ${user.remainingFollowUps}" th:attr="data-id=${followUp.id}">
         <div class="lead-info">
           <div class="lead-icon">👤</div>
           <div class="lead-text">

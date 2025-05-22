@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.followup.backend.dto.AddFollowUpFormDTO;
 import com.followup.backend.dto.CourseDTO;
 import com.followup.backend.dto.DepartmentDTO;
+import com.followup.backend.dto.EditLeadDetailsDTO;
+import com.followup.backend.dto.EmployeeReportDTO;
 import com.followup.backend.dto.EmployeeSummaryDTO;
 import com.followup.backend.dto.FollowUpTrendDTO;
 import com.followup.backend.dto.NewFollowUpFormDTO;
@@ -23,9 +26,6 @@ import com.followup.backend.repository.*;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @Controller
 @RequestMapping
@@ -267,7 +267,6 @@ public class HomeController {
 
             followUp.getNodes().sort((n1, n2) -> n2.getDate().compareTo(n1.getDate()));
 
-
             model.addAttribute("followUp", followUp);
         } catch (Exception e) {
             redirAttrs.addFlashAttribute("message", "FollowUp not found");
@@ -412,10 +411,8 @@ public class HomeController {
         return "redirect:/remaining-followup/" + id;
     }
 
-    @GetMapping("/completed-followup/{id}")
-    public String showCFollowUpDetails(@PathVariable Long id, Model model, HttpSession session,
-            RedirectAttributes redirAttrs) {
-
+    @GetMapping("/remaining-followup/{id}/edit-lead-details")
+    public String showEditLeadDetailsPage(HttpSession session, @PathVariable Long id, Model model, RedirectAttributes redirAttrs) {
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
 
@@ -430,15 +427,78 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        try {
-            FollowUp followUp = followUpRepository.findById(id).orElseThrow(() -> new Exception("FollowUp not found"));
-            model.addAttribute("followUp", followUp);
-        } catch (Exception e) {
-            redirAttrs.addFlashAttribute("message", "FollowUp not found");
-            return "redirect:/completed-followup";
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        List<CourseDTO> courses = courseRepository.findAll()
+                .stream()
+                .map(c -> new CourseDTO(c.getCode(), c.getName(), c.getDepartment().getId()))
+                .toList();
+
+        EditLeadDetailsDTO editLeadDetailsDTO = new EditLeadDetailsDTO();
+        FollowUp followUp = followUpRepository.findById(id).orElse(null);
+        if (followUp != null) {
+            editLeadDetailsDTO.setFollowUpId(id);
+            editLeadDetailsDTO.setLeadId(followUp.getLead().getId());
+            editLeadDetailsDTO.setLeadName(followUp.getLead().getName());
+            editLeadDetailsDTO.setMobile(followUp.getLead().getPhoneNumber());
+            editLeadDetailsDTO.setEmail(followUp.getLead().getEmail());
+            editLeadDetailsDTO.setAddress(followUp.getLead().getAddress());
+            editLeadDetailsDTO.setDepartmentId(followUp.getCourse().getDepartment().getId());
+            editLeadDetailsDTO.setCourseCode(followUp.getCourse().getCode());
+            followUp.getNodes().sort((n1, n2) -> n2.getDate().compareTo(n1.getDate()));
+            editLeadDetailsDTO.setNodes(followUp.getNodes());
         }
 
         model.addAttribute("user", user);
+        model.addAttribute("departments", departments);
+        model.addAttribute("courses", courses);
+        model.addAttribute("editLeadDetailsDTO", editLeadDetailsDTO);
+        return "edit-lead-details";
+    }
+
+
+    @GetMapping("/completed-followup/{id}")
+    public String showCFollowUpDetails(@PathVariable Long id, Model model, HttpSession session,
+            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null || (!role.equals("FOLLOWUP_EMPLOYEE") && !role.equals("ADMIN"))) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        if (role.equals("ADMIN")) {
+            Admin user = adminRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+
+            model.addAttribute("user", user);
+        } else {
+            FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            
+            model.addAttribute("user", user);
+        }
+
+        Optional<FollowUp> optionalFollowUp = followUpRepository.findById(id);
+        if (optionalFollowUp.isEmpty()) {
+            redirAttrs.addFlashAttribute("message", "FollowUp not found");
+            return "redirect:/completed-followup";
+        }
+        model.addAttribute("followUp", optionalFollowUp.get());
+
+        System.out.println("\n\nRole: " + session.getAttribute("userRole") + "\n\n");
+        System.out.println("\n\nEmail: " + session.getAttribute("userEmail") + "\n\n");
 
         return "completed-followup-details";
     }
@@ -509,8 +569,8 @@ public class HomeController {
                 .map(c -> new CourseDTO(c.getCode(), c.getName(), c.getDepartment().getId()))
                 .toList();
 
-        
-        List<FollowUp> last12MonthsFollowUps = followUpRepository.findByCreatedAtAfter(LocalDate.now().minusMonths(12).atStartOfDay());
+        List<FollowUp> last12MonthsFollowUps = followUpRepository
+                .findByCreatedAtAfter(LocalDate.now().minusMonths(12).atStartOfDay());
 
         List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
 
@@ -554,9 +614,9 @@ public class HomeController {
         return "report-dashboard";
     }
 
-    @GetMapping("/master/course")
-    public String showMasterCoursePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
-        
+    @GetMapping("/employee/{id}/report")
+    public String showEmployeeReportPage(@PathVariable Long id, HttpSession session, Model model,
+            RedirectAttributes redirAttrs) {
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
 
@@ -570,7 +630,48 @@ public class HomeController {
             redirAttrs.addFlashAttribute("error", "User not found");
             return "redirect:/login";
         }
-        
+
+        EmployeeReportDTO employeeReportDTO = new EmployeeReportDTO();
+
+        FollowUpEmployee employee = followUpEmployeeRepository.findById(id).orElse(null);
+        if (employee == null) {
+            redirAttrs.addFlashAttribute("error", "Employee not found");
+            return "redirect:/report";
+        }
+
+        employeeReportDTO.setId(employee.getId());
+        employeeReportDTO.setName(employee.getName());
+        employeeReportDTO
+                .setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : "N/A");
+        employeeReportDTO.setEmail(employee.getEmail());
+        employeeReportDTO.setPhoneNumber(employee.getPhoneNumber());
+
+        List<FollowUp> followUps = employee.getCompletedFollowUps();
+        employeeReportDTO.setFollowUps(followUps);
+
+        model.addAttribute("employeeReport", employeeReportDTO);
+        model.addAttribute("user", user);
+
+        return "employee-report";
+    }
+
+    @GetMapping("/master/course")
+    public String showMasterCoursePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
         model.addAttribute("user", user);
 
         return "add-course";

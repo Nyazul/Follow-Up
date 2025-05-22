@@ -1,105 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<body>
-
+  <body>
     <div th:fragment="navbar(role, activePage)">
-        <!-- Top Navbar (for mobile toggle) -->
-        <nav class="navbar navbar-light bg-light fixed-top d-block d-md-none">
-            <div class="container-fluid">
-                <button class="btn btn-outline-secondary d-md-none" type="button" id="sidebarToggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                <span class="navbar-brand mb-0 h1" th:text="${user.name}">Username</span>
-            </div>
-        </nav>
-
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <h5 class="text-center mb-4" th:text="${user.name}">Username</h5>
-            <div class="accordion" id="adminSidebar">
-
-                <!-- Master -->
-                <div th:if="${role} == ADMIN" class="accordion-item border-0">
-                    <h2 class="accordion-header" id="masterHeading">
-                        <button class="accordion-button d-flex justify-content-between align-items-center"
-                            th:classappend="${activePage} != 'master-course' and ${activePage} != 'master-department' and ${activePage} != 'master-employee' ? 'collapse' : ''"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#masterCollapse">
-                            <span><i class="bi bi-gear me-2"></i> Master</span>
-
-                        </button>
-                    </h2>
-                    <div id="masterCollapse" th:classappend="${role} == 'ADMIN' ? 'show' : ''"
-                        class="accordion-collapse collapse" data-bs-parent="#adminSidebar">
-                        <div class="accordion-body p-0">
-                            <a th:href="@{/master/course}" class="nav-link ps-5"
-                                th:classappend="${activePage} == master-course ? 'active' : ''">Course</a>
-                            <a th:href="@{/master/department}" class="nav-link ps-5"
-                                th:classappend="${activePage} == master-department ? 'active' : ''">Department</a>
-                            <a th:href="@{/master/employee}" class="nav-link ps-5"
-                                th:classappend="${activePage} == master-employee ? 'active' : ''">Employee</a>
-                        </div>
-                    </div>
-                </div>
-
-
-                <!-- Follow Up -->
-                <div class="accordion-item border-0">
-                    <h2 class="accordion-header" id="followUpHeading">
-                        <button class="accordion-button"
-                            th:classappend="${activePage} != 'remaining' and ${activePage} != 'completed' and ${activePage} != 'new-followup' ? 'collapse' : ''"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#followUpCollapse">
-                            <i class="bi bi-clipboard2-check me-2"></i> Follow Up
-                        </button>
-                    </h2>
-                    <div id="followUpCollapse" class="accordion-collapse collapse"
-                        th:classappend="${role} == 'FOLLOWUP-EMPLOYEE' ? 'show' : ''" data-bs-parent="#adminSidebar">
-                        <div class="accordion-body p-0">
-                            <a th:href="@{/remaining-followup}" class="nav-link ps-5"
-                                th:classappend="${activePage} == remaining ? 'active' : ''">Remaining</a>
-                            <a th:href="@{/completed-followup}" class="nav-link ps-5"
-                                th:classappend="${activePage} == completed ? 'active' : ''">Completed</a>
-                            <a th:href="@{/new-followup}" class="nav-link ps-5"
-                                th:classappend="${activePage} == new-followup ? 'active' : ''">New Follow-Up</a>
-                        </div>
-                    </div>
-                </div>
-
-                <a th:href="@{/task}" class="nav-link px-3" th:classappend="${activePage} == task ? 'active' : ''"><i
-                        class="bi bi-check2-square me-2"></i> Task</a>
-
-                <a th:href="@{/report}" th:if="${role} == ADMIN" class="nav-link px-3"
-                    th:classappend="${activePage} == report ? 'active' : ''"><i class="bi bi-bar-chart-line me-2"></i>
-                    Report</a>
-
-                <!-- Task Management -->
-                <div th:if="${role} == 'ADMIN'" class="accordion-item border-0">
-                    <h2 class="accordion-header" id="taskManagementHeading">
-                        <button class="accordion-button"
-                            th:classappend="${activePage != 'assign-task' and activePage != 'show-task'} ? ' collapsed' : ''"
-                            type="button" data-bs-toggle="collapse" data-bs-target="#taskManagementCollapse">
-                            <i class="bi bi-clipboard2-check me-2"></i> Task Management
-                        </button>
-                    </h2>
-                    <div id="taskManagementCollapse" class="accordion-collapse"
-                        th:classappend="${activePage == 'assign-task' or activePage == 'show-task'} ? ' show' : ' collapse'"
-                        data-bs-parent="#adminSidebar">
-                        <div class="accordion-body p-0">
-                            <a th:href="@{/assign-task}" class="nav-link ps-5"
-                                th:classappend="${activePage} == 'assign-task' ? ' active' : ''">Assign Task</a>
-                            <a th:href="@{/show-task}" class="nav-link ps-5"
-                                th:classappend="${activePage} == 'show-task' ? ' active' : ''">Show Task</a>
-                        </div>
-                    </div>
-                </div>
-
-
-
-            </div>
+      <!-- Top Navbar (for mobile toggle) -->
+      <nav class="navbar navbar-light bg-light fixed-top d-block d-md-none">
+        <div class="container-fluid">
+          <button
+            class="btn btn-outline-secondary d-md-none"
+            type="button"
+            id="sidebarToggle"
+          >
+            <i class="bi bi-list"></i>
+          </button>
+          <span class="navbar-brand mb-0 h1" th:text="${user.name}"
+            >Username</span
+          >
         </div>
-        <div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
+      </nav>
+
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <h5 class="text-center mb-4" th:text="${user.name}">Username</h5>
+        <div class="accordion" id="adminSidebar">
+          <!-- Master -->
+          <div th:if="${role} == 'ADMIN'" class="accordion-item border-0">
+            <h2 class="accordion-header" id="masterHeading">
+              <button
+                class="accordion-button d-flex justify-content-between align-items-center"
+                th:classappend="${activePage} != 'master-course' and ${activePage} != 'master-department' and ${activePage} != 'master-employee' ? 'collapsed' : ''"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#masterCollapse"
+              >
+                <span><i class="bi bi-gear me-2"></i> Master</span>
+              </button>
+            </h2>
+            <div
+              id="masterCollapse"
+              th:classappend="${activePage} != 'master-course' and ${activePage} != 'master-department' and ${activePage} != 'master-employee' ? 'collapse' : 'show'"
+              class="accordion-collapse"
+              data-bs-parent="#adminSidebar"
+            >
+              <div class="accordion-body p-0">
+                <a
+                  href="Course.html"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == master-course ? 'active' : ''"
+                  >Course</a
+                >
+                <a
+                  href="dept1.html"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == master-department ? 'active' : ''"
+                  >Department</a
+                >
+                <a
+                  href="addcourse.html"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == master-employee ? 'active' : ''"
+                  >Employee</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Follow Up -->
+          <div
+            th:if="${role} == 'FOLLOWUP_EMPLOYEE'"
+            class="accordion-item border-0"
+          >
+            <h2 class="accordion-header" id="followUpHeading">
+              <button
+                class="accordion-button"
+                th:classappend="${activePage} != 'remaining' and ${activePage} != 'completed' and ${activePage} != 'new-followup' ? 'collapsed' : ''"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#followUpCollapse"
+              >
+                <i class="bi bi-clipboard2-check me-2"></i> Follow Up
+              </button>
+            </h2>
+            <div
+              id="followUpCollapse"
+              class="accordion-collapse collapse"
+              th:classappend="${activePage} == 'remaining' or ${activePage} == 'completed' or ${activePage} == 'new-followup' ? 'show' : 'collapse'"
+              data-bs-parent="#adminSidebar"
+            >
+              <div class="accordion-body p-0">
+                <a
+                  th:href="@{/remaining-followup}"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == remaining ? 'active' : ''"
+                  >Remaining</a
+                >
+                <a
+                  th:href="@{/completed-followup}"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == completed ? 'active' : ''"
+                  >Completed</a
+                >
+                <a
+                  th:href="@{/new-followup}"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == new-followup ? 'active' : ''"
+                  >New Follow-Up</a
+                >
+              </div>
+            </div>
+          </div>
+
+          <a
+            th:href="@{/task}"
+            class="nav-link px-3"
+            th:classappend="${activePage} == task ? 'active' : ''"
+            ><i class="bi bi-check2-square me-2"></i> Task</a
+          >
+
+          <a
+            th:href="@{/report}"
+            th:if="${role} == ADMIN"
+            class="nav-link px-3"
+            th:classappend="${activePage} == report ? 'active' : ''"
+            ><i class="bi bi-bar-chart-line me-2"></i> Report</a
+          >
+
+          <!-- Task Management -->
+          <div th:if="${role} == 'ADMIN'" class="accordion-item border-0">
+            <h2 class="accordion-header" id="taskManagementHeading">
+              <button
+                class="accordion-button d-flex justify-content-between align-items-center"
+                th:classappend="${activePage != 'assign-task' and activePage != 'show-task'} ? ' collapsed' : ''"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#taskManagementCollapse"
+              >
+                <i class="bi bi-clipboard2-check me-2"></i> Task Management
+              </button>
+            </h2>
+            <div
+              id="taskManagementCollapse"
+              class="accordion-collapse"
+              th:classappend="${activePage == 'assign-task' or activePage == 'show-task'} ? ' show' : ' collapse'"
+              data-bs-parent="#adminSidebar"
+            >
+              <div class="accordion-body p-0">
+                <a
+                  th:href="@{/assign-task}"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == 'assign-task' ? ' active' : ''"
+                  >Assign Task</a
+                >
+                <a
+                  th:href="@{/show-task}"
+                  class="nav-link ps-5"
+                  th:classappend="${activePage} == 'show-task' ? ' active' : ''"
+                  >Show Task</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="sidebarOverlay" class="sidebar-overlay d-md-none"></div>
     </div>
-
-</body>
-
+  </body>
 </html>
