@@ -14,57 +14,57 @@
 
   <div th:replace="~{/navbar :: navbar('ADMIN', 'master-department')}"></div>
   <div class="content">
-  <div class="container bg-white rounded shadow p-4 mb-5">
-    <div class="col-md-2 d-flex align-items-center mb-3">
-      <span class="profile-img me-2"></span>
-      <strong>Add Department</strong>
-    </div>
+    <div class="container bg-white rounded shadow p-4 mb-5">
+      <div class="col-md-2 d-flex align-items-center mb-3">
+        <span class="profile-img me-2"></span>
+        <strong>Add Department</strong>
+      </div>
 
-    <!-- Form -->
-    <form action="/department/add" method="post">
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <label class="form-label"><i class="bi bi-person-fill"></i> Department Name</label>
-          <input type="text" id="departmentInput" class="form-control" placeholder="Department Name" required />
+      <!-- Form -->
+      <form action="/department/add" method="post">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label"><i class="bi bi-person-fill"></i> Department Name</label>
+            <input type="text" id="departmentInput" class="form-control" placeholder="Department Name" required />
+          </div>
         </div>
+
+        <div class="d-flex justify-content-center mt-4">
+          <button type="submit" style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button>
+
+        </div>
+      </form>
+
+      <!-- Displayed Departments -->
+      <div id="departmentList" class="mt-5">
+
+        <ul class="list-group" id="listContainer"></ul>
       </div>
-
-      <div class="d-flex justify-content-center mt-4">
-        <button type="submit" style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button>
-
-      </div>
-    </form>
-
-    <!-- Displayed Departments -->
-    <div id="departmentList" class="mt-5">
-
-      <ul class="list-group" id="listContainer"></ul>
     </div>
-  </div>
 
-  <!-- Script -->
-  <script>
-    const form = document.getElementById("departmentForm");
-    const input = document.getElementById("departmentInput");
-    const list = document.getElementById("listContainer");
+    <!-- Script -->
+    <script>
+      const form = document.getElementById("departmentForm");
+      const input = document.getElementById("departmentInput");
+      const list = document.getElementById("listContainer");
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault(); // Prevent page reload
+      form.addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent page reload
 
-      const deptName = input.value.trim();
-      if (deptName !== "") {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.textContent = deptName;
-        list.appendChild(li);
-        input.value = ""; // Clear input
+        const deptName = input.value.trim();
+        if (deptName !== "") {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.textContent = deptName;
+          list.appendChild(li);
+          input.value = ""; // Clear input
+        }
+      });
+
+      function resetForm() {
+        document.getElementById("departmentForm").reset();
       }
-    });
-
-    function resetForm() {
-      document.getElementById("departmentForm").reset();
-    }
-  </script>
+    </script>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script th:src="@{/main.js}"></script>
