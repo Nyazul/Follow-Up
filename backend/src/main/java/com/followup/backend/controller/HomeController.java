@@ -1,8 +1,10 @@
 package com.followup.backend.controller;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -500,10 +502,10 @@ public class HomeController {
         lead.setUpdatedAt(LocalDateTime.now());
 
         Course course = courseRepository.findById(editLeadDetailsDTO.getCourseCode()).orElse(null);
-        
 
         if (followUp.getCourse().getCode() != course.getCode()) {
-            System.out.println("\n\nCourse changed from " + followUp.getCourse().getName() + " to " + course.getName() + "\n\n");
+            System.out.println(
+                    "\n\nCourse changed from " + followUp.getCourse().getName() + " to " + course.getName() + "\n\n");
 
             // add a new node for course change
             FollowUpNode followUpNode = new FollowUpNode();
@@ -592,18 +594,49 @@ public class HomeController {
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
 
-        if (email == null || !role.equals("BASIC_EMPLOYEE")) {
-            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+        if (email == null || role == null
+                || (!role.equals("FOLLOWUP_EMPLOYEE") && !role.equals("ADMIN") && !role.equals("BASIC_EMPLOYEE"))) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
             return "redirect:/login";
         }
 
-        BasicEmployee user = basicEmployeeRepository.findByEmail(email);
-        if (user == null) {
-            redirAttrs.addFlashAttribute("error", "User not found");
-            return "redirect:/login";
+        if (role.equals("ADMIN")) {
+            Admin user = adminRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+
+            List<Task> tasks = new ArrayList<>(user.getTasks().stream().filter(t -> !t.isCompleted()).toList());
+            tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
+            
+            model.addAttribute("tasks", tasks);
+            model.addAttribute("user", user);
+        } else if (role.equals("FOLLOWUP_EMPLOYEE")) {
+            FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+
+            List<Task> tasks = user.getTasks().stream().filter(t -> !t.isCompleted()).toList();
+            tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
+
+            model.addAttribute("tasks", tasks);
+            model.addAttribute("user", user);
+        } else if (role.equals("BASIC_EMPLOYEE")) {
+            BasicEmployee user = basicEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            List<Task> tasks = user.getTasks().stream().filter(t -> !t.isCompleted()).toList();
+            tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
+
+            model.addAttribute("tasks", tasks);
+            model.addAttribute("user", user);
         }
 
-        model.addAttribute("user", user);
         return "task";
     }
 
@@ -773,7 +806,7 @@ public class HomeController {
 
     @GetMapping("/master/employee")
     public String showMasterEmployeePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
-        
+
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
 
@@ -787,12 +820,11 @@ public class HomeController {
             redirAttrs.addFlashAttribute("error", "User not found");
             return "redirect:/login";
         }
-        
+
         model.addAttribute("user", user);
 
         return "add-employee";
 
     }
-    
 
 }
