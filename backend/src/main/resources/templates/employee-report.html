@@ -14,7 +14,7 @@
 <body class="d-flex flex-column min-vh-100">
 
   <!-- Navbar -->
-  <div th:replace="~{/navbar :: navbar('FOLLOWUP-EMPLOYEE', 'report')}"></div>
+  <div th:replace="~{/navbar :: navbar('ADMIN', 'report')}"></div>
 
   <div class="content">
 
@@ -41,6 +41,11 @@
           <p><strong>Department :</strong> <span th:text="${employee.department.name}">CS</span></p>
         </div>
       </div>
+
+      <script th:inline="javascript">
+        let employee = /*[[${employee}]]*/ {};
+        let followUps = /*[[${followUps}]]*/ [];
+      </script>
 
       <!-- Time Range Selector -->
       <div class="row mb-3">
@@ -76,14 +81,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script th:src="@{/main.js}"></script>
 
-  <script>
-    const dummyData = [];
-    const now = new Date();
-    for (let i = 0; i < 40; i++) {
-      const d = new Date(now);
-      d.setDate(now.getDate() - Math.floor(Math.random() * 30));
-      dummyData.push({ date: d.toISOString(), completed: 1 });
-    }
+  <script>    
+
+    let followUpData = [...followUps].map(f => ({
+      date: f.dueDate,
+      completed: f.completed
+    }));
 
     function groupData(data, range) {
       const result = {};
@@ -118,7 +121,7 @@
     }
 
     function renderChart(range) {
-      const grouped = groupData(dummyData, range);
+      const grouped = groupData(followUpData, range);
       const labels = Object.keys(grouped);
       const values = Object.values(grouped);
 
@@ -162,7 +165,7 @@
       });
 
       document.getElementById('loadFollowupsBtn').addEventListener('click', async () => {
-        const response = await fetch('/api/employee/followups'); // adjust endpoint as needed
+        const response = await fetch(`/api/employee/${employee.id}/followups`); // adjust endpoint as needed
         const followUps = await response.json();
 
         const container = document.getElementById('followupContainer');

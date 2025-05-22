@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.followup.backend.dto.AddFollowUpFormDTO;
 import com.followup.backend.dto.CourseDTO;
 import com.followup.backend.dto.DepartmentDTO;
+import com.followup.backend.dto.EmployeeReportDTO;
 import com.followup.backend.dto.EmployeeSummaryDTO;
 import com.followup.backend.dto.FollowUpTrendDTO;
 import com.followup.backend.dto.NewFollowUpFormDTO;
@@ -554,6 +555,46 @@ public class HomeController {
         return "report-dashboard";
     }
 
+    @GetMapping("/employee/{id}/report")
+    public String showEmployeeReportPage(@PathVariable Long id, HttpSession session, Model model,
+            RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        EmployeeReportDTO employeeReportDTO = new EmployeeReportDTO();
+
+        FollowUpEmployee employee = followUpEmployeeRepository.findById(id).orElse(null);
+        if (employee == null) {
+            redirAttrs.addFlashAttribute("error", "Employee not found");
+            return "redirect:/report";
+        }
+
+        employeeReportDTO.setId(employee.getId());
+        employeeReportDTO.setName(employee.getName());
+        employeeReportDTO.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : "N/A");
+        employeeReportDTO.setEmail(employee.getEmail());
+        employeeReportDTO.setPhoneNumber(employee.getPhoneNumber());
+
+        List<FollowUp> followUps = employee.getCompletedFollowUps();
+        employeeReportDTO.setFollowUps(followUps);
+
+        model.addAttribute("employeeReport", employeeReportDTO);
+        model.addAttribute("user", user);
+
+        return "employee-report";
+    }
+
     @GetMapping("/master/course")
     public String showMasterCoursePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
         
@@ -577,5 +618,6 @@ public class HomeController {
 
     }
     
+
 
 }
