@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.followup.backend.dto.FollowUpDTO;
 import com.followup.backend.model.FollowUp;
 import com.followup.backend.model.FollowUpEmployee;
 import com.followup.backend.repository.FollowUpEmployeeRepository;
@@ -21,14 +22,27 @@ public class APIController {
     @Autowired
     FollowUpEmployeeRepository followUpEmployeeRepository;
 
-    @GetMapping("/api/employee/{id}/followups")
+    @GetMapping("/employee/{id}/followups")
     @ResponseBody
-    public List<FollowUp> getFollowUpsForEmployee(@PathVariable Long id) {
+    public List<FollowUpDTO> getFollowUpsForEmployee(@PathVariable Long id) {
         FollowUpEmployee employee = followUpEmployeeRepository.findById(id).orElse(null);
         if (employee == null) {
             return Collections.emptyList();
         }
-        return employee.getCompletedFollowUps();
+        List<FollowUpDTO> followUps = employee.getCompletedFollowUps().stream()
+                .map(followUp -> new FollowUpDTO(
+                        followUp.getId(),
+                        followUp.getDescription(),
+                        followUp.getLead().getName(),
+                        followUp.getDueDate(),
+                        followUp.getCourse().getName()))
+                .toList();
+         
+        if (followUps.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return followUps;
     }
 
 }

@@ -14,7 +14,7 @@
 
 <body class="d-flex flex-column min-vh-100">
 
-  <div th:replace="~{/navbar :: navbar('FOLLOWUP-EMPLOYEE', 'remaining')}"></div>
+  <div th:replace="~{/navbar :: navbar('FOLLOWUP_EMPLOYEE', 'remaining')}"></div>
 
   <div class="content">
 
@@ -68,7 +68,7 @@
             th:href="@{/remaining-followup/{id}/mark-complete(id=${followUp.id})}"><strong>Mark complete ✅</strong></a>
         </div>
         <div class="col-md-4">
-          <a class="btn btn-warning w-100 mb-2" th:href="@{/remaining-followup}"><strong>Edit details ✏️</strong></a>
+          <a class="btn btn-warning w-100 mb-2" th:href="@{/remaining-followup/{id}/edit-lead-details(id=${followUp.id})}"><strong>Edit details ✏️</strong></a>
 
         </div>
         <div class="col-md-4">

@@ -1,197 +1,256 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Employee Detail - FollowUps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/main.css}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Employee Detail - FollowUps</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/main.css}">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+  <body class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <div th:replace="~{/navbar :: navbar('ADMIN', 'report')}"></div>
 
-<body class="d-flex flex-column min-vh-100">
+    <div class="content">
+      <!-- Alerts -->
+      <div
+        th:if="*{message!=null and #strings.length(message)>0}"
+        class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder"
+        th:text="${message}"
+      ></div>
+      <div
+        th:if="*{error!=null and #strings.length(error)>0}"
+        class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder"
+        th:text="${error}"
+      ></div>
 
-  <!-- Navbar -->
-  <div th:replace="~{/navbar :: navbar('ADMIN', 'report')}"></div>
-
-  <div class="content">
-
-    <!-- Alerts -->
-    <div th:if="*{message!=null and #strings.length(message)>0}" class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder" th:text="${message}"></div>
-    <div th:if="*{error!=null and #strings.length(error)>0}" class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
-
-    <!-- Employee Info -->
-    <div class="container bg-white rounded shadow p-4 mb-4">
-      <h4 class="mb-4">Employee Detail</h4>
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <p><strong>Name :</strong> <span th:text="${employee.name}">Alice</span></p>
+      <!-- Employee Info -->
+      <div class="container bg-white rounded shadow p-4 mb-4">
+        <h4 class="mb-4 text-primary fw-bolder text-center">Employee Detail</h4>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <p>
+              <strong>Name :</strong>
+              <span th:text="${employeeReport.name}">Alice</span>
+            </p>
+          </div>
+          <div class="col-md-4">
+            <p>
+              <strong>Email :</strong>
+              <span th:text="${employeeReport.email}">alice@example.com</span>
+            </p>
+          </div>
+          <div class="col-md-4">
+            <p>
+              <strong>Phone :</strong>
+              <span th:text="${employeeReport.phoneNumber}">1234567890</span>
+            </p>
+          </div>
         </div>
-        <div class="col-md-4">
-          <p><strong>Email :</strong> <span th:text="${employee.email}">alice@example.com</span></p>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <p>
+              <strong>Department :</strong>
+              <span th:text="${employeeReport.departmentName}">CS</span>
+            </p>
+          </div>
         </div>
-        <div class="col-md-4">
-          <p><strong>Phone :</strong> <span th:text="${employee.phoneNumber}">1234567890</span></p>
+
+        <script th:inline="javascript">
+          let employeeReport = /*[[${employeeReport}]]*/ {};
+        </script>
+
+        <!-- Time Range Selector -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Select Time Range:</label>
+            <select id="timeRange" class="form-select">
+              <option value="week" selected>This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white p-3 mt-3 rounded shadow-sm">
+          <canvas id="trendChart" height="100"></canvas>
         </div>
       </div>
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <p><strong>Department :</strong> <span th:text="${employee.department.name}">CS</span></p>
-        </div>
+
+      <!-- Toggle Button -->
+      <div class="container text-center mb-4">
+        <button id="loadFollowupsBtn" class="btn btn-primary">
+          Load Follow-Ups
+        </button>
       </div>
 
-      <script th:inline="javascript">
-        let employee = /*[[${employee}]]*/ {};
-        let followUps = /*[[${followUps}]]*/ [];
-      </script>
-
-      <!-- Time Range Selector -->
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label class="form-label">Select Time Range:</label>
-          <select id="timeRange" class="form-select">
-            <option value="week" selected>This Week</option>
-            <option value="month">This Month</option>
-            <option value="year">This Year</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Chart -->
-      <div class="bg-white p-3 mt-3 rounded shadow-sm">
-        <canvas id="trendChart" height="100"></canvas>
+      <!-- Follow-Up List -->
+      <div
+        id="followupContainer"
+        class="container bg-white rounded p-4 mb-5 d-none"
+      >
+        <h5 class="mb-3 text-primary fw-bolder text-center">Follow-Ups</h5>
+        <div id="followupList"></div>
       </div>
     </div>
 
-    <!-- Toggle Button -->
-    <div class="container text-center mb-4">
-      <button id="loadFollowupsBtn" class="btn btn-primary">Load Follow-Ups</button>
-    </div>
+    <!-- Bootstrap & Chart Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/main.js}"></script>
 
-    <!-- Follow-Up List -->
-    <div id="followupContainer" class="container bg-white rounded shadow p-4 mb-5 d-none">
-      <h5 class="mb-3">Follow-Ups</h5>
-      <div id="followupList"></div>
-    </div>
-  </div>
+    <script>
+      let followUpData = employeeReport.followUps.map((f) => ({
+        date: f.dueDate,
+      }));
 
-  <!-- Bootstrap & Chart Script -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script th:src="@{/main.js}"></script>
+      function groupData(data, range) {
+        const result = {};
+        const weekdayOrder = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const monthOrder = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
 
-  <script>    
+        data.forEach((entry) => {
+          const date = new Date(entry.date);
+          let key;
 
-    let followUpData = [...followUps].map(f => ({
-      date: f.dueDate,
-      completed: f.completed
-    }));
-
-    function groupData(data, range) {
-      const result = {};
-      const weekdayOrder = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-      const monthOrder = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-      data.forEach(entry => {
-        const date = new Date(entry.date);
-        let key;
-        switch (range) {
-          case 'week':
-            key = date.toLocaleDateString('en-US', { weekday: 'short' });
-            break;
-          case 'month':
-            key = `Week ${Math.ceil(date.getDate() / 7)}`;
-            break;
-          case 'year':
-            key = date.toLocaleDateString('en-US', { month: 'short' });
-            break;
-        }
-        result[key] = (result[key] || 0) + entry.completed;
-      });
-
-      let keys;
-      if (range === 'week') keys = weekdayOrder.filter(k => k in result);
-      else if (range === 'year') keys = monthOrder.filter(k => k in result);
-      else keys = Object.keys(result).sort();
-
-      const sorted = {};
-      keys.forEach(k => sorted[k] = result[k]);
-      return sorted;
-    }
-
-    function renderChart(range) {
-      const grouped = groupData(followUpData, range);
-      const labels = Object.keys(grouped);
-      const values = Object.values(grouped);
-
-      const ctx = document.getElementById('trendChart').getContext('2d');
-      if (window.trendChart && typeof window.trendChart.destroy === 'function') {
-        window.trendChart.destroy();
-      }
-
-      window.trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Completed Follow-Ups',
-            data: values,
-            borderColor: '#0d6efd',
-            backgroundColor: 'rgba(13,110,253,0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: { display: true, text: 'Count' }
-            },
-            x: {
-              title: { display: true, text: 'Time' }
-            }
+          switch (range) {
+            case "week":
+              key = date.toLocaleDateString("en-US", { weekday: "short" });
+              break;
+            case "month":
+              key = `Week ${Math.ceil(date.getDate() / 7)}`;
+              break;
+            case "year":
+              key = date.toLocaleDateString("en-US", { month: "short" });
+              break;
           }
-        }
-      });
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      renderChart('week');
-      document.getElementById('timeRange').addEventListener('change', e => {
-        renderChart(e.target.value);
-      });
-
-      document.getElementById('loadFollowupsBtn').addEventListener('click', async () => {
-        const response = await fetch(`/api/employee/${employee.id}/followups`); // adjust endpoint as needed
-        const followUps = await response.json();
-
-        const container = document.getElementById('followupContainer');
-        const list = document.getElementById('followupList');
-        list.innerHTML = '';
-
-        followUps.forEach(followUp => {
-          const div = document.createElement('div');
-          div.classList.add('border-bottom', 'pb-3', 'mb-3');
-          div.innerHTML = `
-            <div class="row">
-              <div class="col-md-4"><strong>Lead:</strong> ${followUp.lead.name}</div>
-              <div class="col-md-4"><strong>Date:</strong> ${new Date(followUp.dueDate).toLocaleString()}</div>
-            </div>
-            <div class="row mt-2">
-              <div class="col-md-4"><strong>Description:</strong> ${followUp.description}</div>
-              <div class="col-md-4"><strong>Course:</strong> ${followUp.course}</div>
-            </div>
-          `;
-          list.appendChild(div);
+          result[key] = (result[key] || 0) + 1;
         });
 
-        container.classList.remove('d-none');
-      });
-    });
-  </script>
+        let keys;
+        if (range === "week") keys = weekdayOrder.filter((k) => k in result);
+        else if (range === "year") keys = monthOrder.filter((k) => k in result);
+        else keys = Object.keys(result).sort();
 
-</body>
+        const sorted = {};
+        keys.forEach((k) => (sorted[k] = result[k]));
+        return sorted;
+      }
+
+      function renderChart(range) {
+        const grouped = groupData(followUpData, range);
+        const labels = Object.keys(grouped);
+        const values = Object.values(grouped);
+
+        const ctx = document.getElementById("trendChart").getContext("2d");
+        if (
+          window.trendChart &&
+          typeof window.trendChart.destroy === "function"
+        ) {
+          window.trendChart.destroy();
+        }
+
+        window.trendChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Completed Follow-Ups",
+                data: values,
+                borderColor: "#0d6efd",
+                backgroundColor: "rgba(13,110,253,0.1)",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: "Count" },
+              },
+              x: {
+                title: { display: true, text: "Time" },
+              },
+            },
+          },
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        renderChart("week");
+        document.getElementById("timeRange").addEventListener("change", (e) => {
+          renderChart(e.target.value);
+        });
+
+        document
+          .getElementById("loadFollowupsBtn")
+          .addEventListener("click", async () => {
+            const response = await fetch(
+              `/api/employee/${employeeReport.id}/followups`
+            ); // adjust endpoint as needed
+            const followUps = await response.json();
+
+            const container = document.getElementById("followupContainer");
+            const list = document.getElementById("followupList");
+            list.innerHTML = "";
+
+            followUps.forEach((followUp) => {
+              const div = document.createElement("div");
+              div.onclick = () => {
+                window.location.href = `/completed-followup/${followUp.id}`;
+              };
+              div.classList.add("border-bottom", "pb-3", "mb-3", "container", "rounded", "shadow", "cursor-pointer", "hover-effect");
+              div.innerHTML = `
+            <div class="row hover">
+              <div class="col-md-4"><strong>Lead : </strong> ${
+                followUp.leadName
+              }</div>
+              <div class="col-md-4"><strong>Date : </strong> ${new Date(
+                followUp.dueDate
+              ).toLocaleString()}</div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-4"><strong>Description : </strong> ${
+                followUp.description
+              }</div>
+              <div class="col-md-4"><strong>Course : </strong> ${
+                followUp.courseName
+              }</div>
+            </div>
+          `;
+              list.appendChild(div);
+            });
+
+            container.classList.remove("d-none");
+          });
+      });
+    </script>
+  </body>
 </html>

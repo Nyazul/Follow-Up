@@ -1,241 +1,250 @@
 /* Navbar */
 
 .sidebar {
-    background-color: white;
-    border: 2px solid;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 250px;
-    padding-top: 60px;
-    transition: all 0.3s ease-in-out;
-    z-index: 1030;
+  background-color: white;
+  border: 2px solid;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 250px;
+  padding-top: 60px;
+  transition: all 0.3s ease-in-out;
+  z-index: 1030;
 }
 
 .sidebar .nav-link {
-    color: #333;
-    font-weight: 500;
+  color: #333;
+  font-weight: 500;
 }
 
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
-    background-color: #FFB4A2;
-    color: #000;
+  background-color: #ffb4a2;
+  color: #000;
 }
 
 .content {
-    margin-left: 250px;
-    padding: 1rem 2rem;
-    transition: all 0.3s ease-in-out;
+  margin-left: 250px;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease-in-out;
 }
 
-
 @media (max-width: 768px) {
-    .sidebar {
-        margin-left: -250px;
-    }
+  .sidebar {
+    margin-left: -250px;
+  }
 
-    .sidebar.show {
-        margin-left: 0;
-    }
+  .sidebar.show {
+    margin-left: 0;
+  }
 
-    .content {
-        margin-top: 20px;
-        margin-left: 0;
-    }
-
+  .content {
+    margin-top: 20px;
+    margin-left: 0;
+  }
 }
 
 .accordion-button {
-    background-color: #FFCDB2;
+  background-color: #ffcdb2;
 }
 
 .accordion-button:not(.collapsed) {
-    background-color: #E5989B;
-    color: white;
+  background-color: #e5989b;
+  color: white;
 }
 
 .sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1029;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1029;
 }
 
-.sidebar.show+.sidebar-overlay {
-    display: block;
+.sidebar.show + .sidebar-overlay {
+  display: block;
 }
-
-
 
 /* Navbar - End */
 
 .timeline-line {
-    border-left: 2px solid #B5838D;
-    margin-left: 30px;
-    position: relative;
+  border-left: 2px solid #b5838d;
+  margin-left: 30px;
+  position: relative;
 }
 
 .timeline-entry {
-    position: relative;
-    margin-bottom: 40px;
-    padding-left: 60px;
+  position: relative;
+  margin-bottom: 40px;
+  padding-left: 60px;
 }
 
 .timeline-entry::before {
-    content: '';
-    position: absolute;
-    left: 30px;
-    top: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: #B5838D;
-    border-radius: 50%;
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  background-color: #b5838d;
+  border-radius: 50%;
 }
 
 .timeline-date-box {
-    width: 80px;
-    height: 60px;
-    border: 2px solid #E5989B;
-    text-align: center;
-    font-weight: bold;
-    padding-top: 8px;
-    border-radius: 5px;
-    margin-right: 20px;
-    color: #E5989B;
+  width: 80px;
+  height: 60px;
+  border: 2px solid #e5989b;
+  text-align: center;
+  font-weight: bold;
+  padding-top: 8px;
+  border-radius: 5px;
+  margin-right: 20px;
+  color: #e5989b;
 }
 
 .icon-btn {
-    cursor: pointer;
-    color: #B5838D;
+  cursor: pointer;
+  color: #b5838d;
 }
 
 .timeline-container {
-    background-color: #fff;
+  background-color: #fff;
 }
 
 .card {
-    background-color: #fff;
+  background-color: #fff;
 }
 
+.cursor-pointer * {
+  cursor: pointer;
+}
+
+.hover-effect:hover {
+    transition: all 0.3s ease-in-out;
+    transform: scale(1.05);
+  background-color: #ffcdb2; /* Light gray */
+}
+
+.hover-effect {
+    transition: all 0.3s ease-in-out;
+}
+
+
 .text-primary {
-    color: #B5838D !important;
+  color: #b5838d !important;
 }
 
 /* Remaining FollowUp */
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 0;
-    padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  margin: 0;
+  padding: 0;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
 }
 
 .header-left {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .header-right {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
 }
 
 .header-right span {
-    font-weight: bold;
-    cursor: pointer;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .section-title {
-    text-align: center;
-    color: rgb(181, 130, 140);
-    margin: 2rem 0 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
+  text-align: center;
+  color: rgb(181, 130, 140);
+  margin: 2rem 0 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .lead-card {
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    margin: 1rem 2rem;
-    padding: 1rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    border-bottom: 1px solid #ddd;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  margin: 1rem 2rem;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
 }
 
 .lead-info {
-    display: flex;
+  display: flex;
 }
 
 .lead-icon {
-    font-size: 40px;
-    margin-right: 20px;
+  font-size: 40px;
+  margin-right: 20px;
 }
 
 .lead-text {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .lead-title {
-    font-weight: bold;
-    font-size: 16px;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .add-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 45px;
-    height: 45px;
-    font-size: 26px;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 5px;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 45px;
+  height: 45px;
+  font-size: 26px;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
 }
 
 .arrow-btn {
-    font-size: 22px;
-    align-self: center;
-    cursor: pointer;
+  font-size: 22px;
+  align-self: center;
+  cursor: pointer;
 }
 
 #mainContent {
-    padding: 1rem 2rem;
+  padding: 1rem 2rem;
 }
 
 @media (max-width: 768px) {
-    .lead-card {
-        flex-direction: column;
-        align-items: start;
-        margin: 1rem 0rem;
-    }
+  .lead-card {
+    flex-direction: column;
+    align-items: start;
+    margin: 1rem 0rem;
+  }
 
-    #mainContent {
-        padding: 1rem 0rem;
-    }
+  #mainContent {
+    padding: 1rem 0rem;
+  }
 
-    .arrow-btn {
-        align-self: flex-end;
-    }
+  .arrow-btn {
+    align-self: flex-end;
+  }
 }
-
-
 
 /* FollowUp - End */
