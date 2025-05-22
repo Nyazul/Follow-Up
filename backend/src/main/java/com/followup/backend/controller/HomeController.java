@@ -771,4 +771,28 @@ public class HomeController {
 
     }
 
+    @GetMapping("/master/employee")
+    public String showMasterEmployeePage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
+        
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+        
+        model.addAttribute("user", user);
+
+        return "add-employee";
+
+    }
+    
+
 }
