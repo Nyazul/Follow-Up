@@ -61,14 +61,15 @@
                          <option value="BBA">BBA</option> -->
                 </select>
             </div>
+            <div class="col-md-3">
+                <select id="sortFilter" class="form-select">
+                    <option value="desc">Most Completed</option>
+                    <option value="asc">Least Completed</option>
+                </select>
+            </div>
 
         </div>
-        <div class="col-md-3">
-            <select id="sortFilter" class="form-select">
-                <option value="desc">Most Completed</option>
-                <option value="asc">Least Completed</option>
-            </select>
-        </div>
+        
 
         <!-- Employee Cards -->
         <div id="employeeList" class="row row-cols-1 row-cols-md-2 g-4"></div>
@@ -152,7 +153,7 @@
                     <li><strong>This Week:</strong> ${emp.completedWeek}</li>
                     <li><strong>This Month:</strong> ${emp.completedMonth}</li>
                     </ul>
-                    <a href="#" class="btn btn-sm btn-outline-primary">View Report</a>
+                    <a href='/employee/${emp.id}/report' class="btn btn-sm btn-outline-primary">View Report</a>
                 </div>
                 </div>
             </div>`;

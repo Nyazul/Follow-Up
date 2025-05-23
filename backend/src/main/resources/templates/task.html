@@ -1,195 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Task Board with Sidebar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-      background-color: #f0f0f0;
-    }
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/main.css}" />
+  </head>
 
-    
-
-    .nav-links {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-size: 16px;
-    }
-
-    .nav-links a:hover {
-      text-decoration: underline;
-    }
-
-    .logout-btn {
-      background-color: red;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      align-self: start;
-    }
-
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      background: #fff;
-      padding: 10px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .task-container {
-      padding: 30px;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .task-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #fff;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(247, 65, 105, 0.1);
-    }
-
-    .drag-icon, .date-icon {
-      width: 40px;
-      height: 40px;
-      margin-right: 15px;
-      background-color: #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-    }
-
-    .task-info {
-      flex: 1;
-    }
-
-    .task-title {
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    .task-body {
-      font-size: 14px;
-      color: #555555;
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .task-actions button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .add-button {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: black;
-      color: white;
-      font-size: 24px;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    .tooltip {
-      position: absolute;
-      background: black;
-      color: white;
-      font-size: 12px;
-      padding: 5px 10px;
-      border-radius: 4px;
-      top: -25px;
-      left: 0;
-    }
-
-    .drag-wrapper {
-      position: relative;
-    }
-  </style>
-</head>
-<body>
-
-  
-
-  <div class="main-content">
-    <header>
-      <div><strong>Employee Name</strong></div>
-      <div class="nav-links">
-        <span>Follow Up</span>
-        <span>Task</span>
-        <span>Notifications</span>
-      </div>
-    </header>
-
-    <div class="task-container">
-      <div class="task-card">
-        <div class="drag-wrapper">
-    
-        </div>
-        <div class="date-icon">28</div>
-        <div class="task-info">
-          <div class="task-title">Task title</div>
-          <div class="task-body">This will be the body of the task</div>
-        </div>
-        <div class="task-actions">
-          <button title="Edit">✏️</button>
-          <button title="Delete">🗑️</button>
-        </div>
-      </div>
-
-      <div class="task-card">
-        <div class="drag-icon">::</div>
-        <div class="task-info">
-          <div class="task-title">Task title</div>
-          <div class="task-body">This will be the body of the task</div>
-        </div>
-        <div class="task-actions">
-          <button title="Edit">✏️</button>
-          <button title="Delete">🗑️</button>
-        </div>
-      </div>
-
-    
+  <body class="d-flex flex-column min-vh-100">
+    <!-- For FOLLOWUP_EMPLOYEE -->
+    <div th:if="${session.userRole == 'FOLLOWUP_EMPLOYEE'}">
+      <div th:replace="~{/navbar :: navbar('FOLLOWUP_EMPLOYEE', 'task')}"></div>
     </div>
 
-    <div class="add-button" title="Add Task">+</div>
-  </div>
+    <!-- For ADMIN -->
+    <div th:if="${session.userRole == 'ADMIN'}">
+      <div th:replace="~{/navbar :: navbar('ADMIN', 'task')}"></div>
+    </div>
 
-</body>
+    <!-- For BASIC_EMPLOYEE -->
+    <div th:if="${session.userRole == 'BASIC_EMPLOYEE'}">
+      <div th:replace="~{/navbar :: navbar('BASIC_EMPLOYEE', 'task')}"></div>
+    </div>
+
+    <div class="content">
+      <div
+        th:if="*{message!=null and #strings.length(message)>0}"
+        class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder"
+        th:text="${message}"
+      ></div>
+
+      <div
+        th:if="*{error!=null and #strings.length(error)>0}"
+        class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder"
+        th:text="${error}"
+      ></div>
+
+      <!-- Timeline -->
+      <div th:if="${tasks != null and !#lists.isEmpty(tasks)}">
+        <div
+          class="text-center lead-card d-flex align-items-start"
+          th:each="task : ${tasks}"
+        >
+          <!-- Left: Date -->
+          <div class="timeline-date-box text-center me-3">
+            <span th:text="${#temporals.format(task.dueDate, 'dd')}">date</span
+            ><br />
+            <span th:text="${#temporals.format(task.dueDate, 'MMM')}"
+              >month</span
+            >
+          </div>
+
+          <!-- Right: Task Content -->
+          <div class="text-center flex-grow-1">
+            <strong
+              th:if="${task.title != null and #strings.length(task.title) > 0}"
+              class="text-primary d-block"
+              th:text="${task.title}"
+              >Title</strong
+            >
+
+            <p
+              th:if="${task.body != null and #strings.length(task.body) > 0}"
+              class="mb-0"
+              th:text="${task.body}"
+            >
+              Description
+            </p>
+          </div>
+          <div class="arrow-btn">
+            <a th:href="@{/task/complete/{id}(id=${task.id})}"
+              ><i
+                class="bi bi-check-circle-fill text-success"
+                title="Finish"
+              ></i
+            ></a>
+          </div>
+        </div>
+      </div>
+      <!-- Add Button -->
+      <button
+        class="add-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#addTaskModal"
+        title="Create Task"
+      >
+        +
+      </button>
+
+      <div th:if="${tasks == null or #lists.isEmpty(tasks)}">
+        <div class="section-title">
+          <span class="alert alert-success">😊 No tasks remaining</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div
+      class="modal fade"
+      id="addTaskModal"
+      tabindex="-1"
+      aria-labelledby="addTaskModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <form th:action="@{/task/add}" method="post">
+            <div class="modal-body">
+              <!-- Date -->
+              <div class="mb-3">
+                <label for="dueDate" class="form-label">Due Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="dueDate"
+                  name="dueDate"
+                  required
+                  min=""
+                />
+              </div>
+
+              <!-- Title -->
+              <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="title"
+                  name="title"
+                  required
+                />
+              </div>
+
+              <!-- Body -->
+              <div class="mb-3">
+                <label for="body" class="form-label">Body</label>
+                <textarea
+                  class="form-control"
+                  id="body"
+                  name="body"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">Add Task</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("dueDate").setAttribute("min", today);
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/main.js}"></script>
+  </body>
 </html>

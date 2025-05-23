@@ -181,6 +181,25 @@ INSERT INTO followup_node (id, title, body, date, done_by, created_at, is_delete
 INSERT INTO followup_node (id, title, body, date, done_by, created_at, is_deleted, followup_id) VALUES (79, 'Node 3', 'Details of node 3 for followup 20', '2025-05-21 15:13:51', 14, '2025-05-21 15:13:51', FALSE, 20);
 INSERT INTO followup_node (id, title, body, date, done_by, created_at, is_deleted, followup_id) VALUES (80, 'Node 4', 'Details of node 4 for followup 20', '2025-05-21 15:13:51', 14, '2025-05-21 15:13:51', FALSE, 20);
 
+-- TASKS
+INSERT INTO task (id, title, body, due_date, user_id, created_at, updated_at, is_completed) VALUES
+(1, 'Prepare report', 'Monthly metrics', NOW() + INTERVAL '1 day', 1, NOW(), NOW(), FALSE),
+(2, 'Update website', 'New course info', NOW() + INTERVAL '2 days', 1, NOW(), NOW(), FALSE),
+(3, 'Fix bug', 'Resolve login issue', NOW() + INTERVAL '3 days', 1, NOW(), NOW(), TRUE),
+(4, 'Call student', 'Discuss application', NOW() + INTERVAL '1 day', 7, NOW(), NOW(), FALSE),
+(5, 'Schedule meeting', 'With department head', NOW() + INTERVAL '4 days', 8, NOW(), NOW(), TRUE),
+(6, 'Prepare slides', 'Lead presentation', NOW() + INTERVAL '2 days', 9, NOW(), NOW(), FALSE);
+INSERT INTO task (id, title, body, due_date, user_id, created_at, updated_at, is_completed) VALUES
+(7, 'Send email', 'Follow up with client', NOW() + INTERVAL '1 day', 10, NOW(), NOW(), FALSE),
+(8, 'Organize files', 'Project documentation', NOW() + INTERVAL '3 days', 11, NOW(), NOW(), TRUE),
+(9, 'Conduct training', 'New software usage', NOW() + INTERVAL '2 days', 12, NOW(), NOW(), FALSE),
+(10, 'Review code', 'Check for errors', NOW() + INTERVAL '4 days', 13, NOW(), NOW(), TRUE);
+INSERT INTO task (id, title, body, due_date, user_id, created_at, updated_at, is_completed) VALUES
+(11, 'Plan event', 'Annual meeting', NOW() + INTERVAL '1 day', 14, NOW(), NOW(), FALSE),
+(12, 'Write article', 'Blog post for website', NOW() + INTERVAL '2 days', 1, NOW(), NOW(), TRUE),
+(13, 'Test software', 'Beta version testing', NOW() + INTERVAL '3 days', 1, NOW(), NOW(), FALSE),
+(14, 'Prepare budget', 'Department expenses', NOW() + INTERVAL '4 days', 1, NOW(), NOW(), TRUE);
+
 -- DONE.
 
 -- SYNC SEQUENCES
@@ -189,3 +208,4 @@ SELECT setval('app_user_id_seq', (SELECT MAX(id) FROM app_user));
 SELECT setval('lead_id_seq', (SELECT MAX(id) FROM lead));
 SELECT setval('followup_id_seq', (SELECT MAX(id) FROM followup));
 SELECT setval('followup_node_id_seq', (SELECT MAX(id) FROM followup_node));
+SELECT setval('task_id_seq', (SELECT MAX(id) FROM task));
