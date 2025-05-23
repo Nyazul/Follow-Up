@@ -352,6 +352,7 @@ public class HomeController {
         return "add-followup";
     }
 
+    @SuppressWarnings("null")
     @PostMapping("/remaining-followup/{id}/add-followup")
     public String addFollowUpNode(
             @PathVariable Long id,

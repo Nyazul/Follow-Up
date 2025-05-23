@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.followup.backend.dto.FollowUpDTO;
-import com.followup.backend.model.FollowUp;
 import com.followup.backend.model.FollowUpEmployee;
 import com.followup.backend.repository.FollowUpEmployeeRepository;
 
