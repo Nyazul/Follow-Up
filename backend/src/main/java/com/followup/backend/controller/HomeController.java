@@ -632,7 +632,6 @@ public class HomeController {
         List<FollowUp> last12MonthsFollowUps = followUpRepository
                 .findByCreatedAtAfter(LocalDate.now().minusMonths(12).atStartOfDay());
 
-
         List<FollowUpTrendDTO> followUpTrends = last12MonthsFollowUps.stream()
                 .map(f -> new FollowUpTrendDTO(
                         f.getUpdatedAt().toLocalDate(),
@@ -675,7 +674,7 @@ public class HomeController {
                 return "redirect:/login";
             }
 
-            List<Task> tasks = user.getTasks().stream().filter(t -> !t.isCompleted()).toList();
+            List<Task> tasks = new ArrayList<>(user.getTasks().stream().filter(t -> !t.isCompleted()).toList());
             tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
 
             model.addAttribute("tasks", tasks);
@@ -686,7 +685,7 @@ public class HomeController {
                 redirAttrs.addFlashAttribute("error", "User not found");
                 return "redirect:/login";
             }
-            List<Task> tasks = user.getTasks().stream().filter(t -> !t.isCompleted()).toList();
+            List<Task> tasks = new ArrayList<>(user.getTasks().stream().filter(t -> !t.isCompleted()).toList());
             tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
 
             model.addAttribute("tasks", tasks);
