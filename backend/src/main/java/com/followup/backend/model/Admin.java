@@ -1,9 +1,11 @@
 package com.followup.backend.model;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 @Entity
-@DiscriminatorValue("ADMIN")
+@DiscriminatorValue("ADMIN") 
+@ToString(callSuper = true)
 public class Admin extends User {
 
 

@@ -1,5 +1,6 @@
 package com.followup.backend.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -12,15 +13,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@ToString(callSuper = true, exclude = {"followUps", "department"})
 @DiscriminatorValue("FOLLOWUP_EMPLOYEE")
 public class FollowUpEmployee extends User {
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<FollowUp> followUps;
+    private List<FollowUp> followUps = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = true)
     private Department department;
 
     @Transient

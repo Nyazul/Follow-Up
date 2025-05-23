@@ -11,29 +11,14 @@
     .form-label {
       font-weight: 600;
     }
-    .sidebar {
-      background-color: #f8f9fa;
-      padding: 20px;
-    }
-    .profile-img {
-      width: 40px;
-      height: 40px;
-      background-color: rgb(181, 130, 140);
-      border-radius: 50%;
-      display: inline-block;
-    }
-    .profile-icon {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-    }
+   
     
   </style>
 </head>
 <body class="bg-light">
 
  
-    <div class="row p-3 bg-white align-items-center shadow-sm">
+     
       <div class="col-md-2 d-flex align-items-center">
         <span class="profile-img me-2"></span>
         <strong>Add Lead</strong>
@@ -41,22 +26,15 @@
       
      
    
-      <div class="container bg-white rounded shadow p-4 mb-5">
+      <div class="container bg-white rounded shadow p-3 mb-4">
         <div class="row mb-3 align-items-center">
-          <div class="col-auto">
-            <img src="img 1.jpg" alt="Icon" class="profile-icon">
-          </div>
-          <div class="col">
-            <input type="text" class="form-control" placeholder="Lead Name">
-          </div>
-              <div class="col text-end">
-                <strong>Add</strong> ✅<br>
-                <strong>Cancel</strong> ❌
-              </div>
-            </div>
-        </body>
-            
+  <div class="col-md-4">
+    <label class="form-label">Lead Name:</label>
+    <input type="text" class="form-control" placeholder="Lead Name">
+  </div>
+</div>
 
+        </body>
             <div class="row mb-3">
               <div class="col-md-4">
                 <label class="form-label">Course :</label>
@@ -64,6 +42,19 @@
                   <option>BSc Computer Science</option>
                   <option>MSc IT</option>
                   <option>BBA</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Address :</label>
+                <input type="text" class="form-control" placeholder="area, city, state">
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                <label class="form-label">Department:</label>
+                <select class="form-select">
+                  <option>Science</option>
+                  <option>Commerce</option>
+                  <option>Arts</option>
                 </select>
               </div>
               <div class="col-md-4">
@@ -81,11 +72,11 @@
                 <label class="form-label">Email :</label>
                 <input type="email" class="form-control" placeholder="abc@xyz.com">
               </div>
-              <div class="col-md-4">
-                <label class="form-label">Address :</label>
-                <input type="text" class="form-control" placeholder="area, city, state">
+             <div class="text-center mt-4">
+                <button type="submit" class="btn mx-2" style="background-color: rgb(229, 152, 155);">Add</button>
+                <button type="reset" class="btn mx-2" style="background-color: rgb(229, 152, 155);">Cancel</button>
               </div>
-            </div>
+
 
            
 
@@ -93,7 +84,9 @@
         </div>
       </div>
     </div>
-  </div>
+    <div class="container bg-white rounded shadow p-3 mb-4">
+      
+          
 
   <!-- Bootstrap JS Bundle + jQuery + Datepicker -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -103,16 +96,14 @@
  
       <div class="row align-items-center mb-3">
         <div class="col-md-2">
-            <input type="text" class="form-control datepicker" placeholder="Select date">
+            <input type="text" class="form-control datepicker" placeholder="next date">
         </div>
         <div class="col-md-4">
           <label class="form-label">Follow up</label>
           <input type="text" class="form-control" placeholder="">
         </div>
-        <div class="col-md-4">
-          <label class="form-label">Done by :</label>
-          <input type="text" class="form-control">
-        </div>
+       
+      </div>
       </div>
       <script>
         $('.datepicker').datepicker({
