@@ -16,14 +16,21 @@
   <div th:replace="~{/navbar :: navbar('ADMIN', 'master-course')}"></div>
 
   <div class="content">
-    <div class="container bg-white rounded shadow p-4 mb-5">
-      <div class="col-md-2 mb-4 d-flex align-items-center">
-        <span class="profile-img me-2"></span>
-        <strong>Add Course</strong>
+
+
+    <div th:if="*{message!=null and #strings.length(message)>0}"
+      class="mt-lg-5 mx-xxl-5 alert bg-primary text-center fw-bolder" th:text="${message}"></div>
+
+    <div th:if="*{error!=null and #strings.length(error)>0}"
+      class="mt-lg-5 mx-xxl-5 alert bg-danger text-center fw-bolder" th:text="${error}"></div>
+
+    <div class="container bg-white rounded shadow p-4 mb-2">
+      <div class="col-md-2 mb-4 d-flex align-items-center text-primary fs-4">
+        <strong>ADD COURSE</strong>
       </div>
 
       <!-- Add Course - Form -->
-      <form action="/course/add" method="post">
+      <form th:action="@{/course/add}" method="post">
         <div class="col-auto">
           <label for="courseName" class="form-label">Course Name</label>
           <input type="text" class="form-control" id="courseName" name="courseName" required>
@@ -33,12 +40,14 @@
           <input type="text" class="form-control" id="courseCode" name="courseCode" required>
         </div>
 
-        <select name="departemnt" id="department">
-          <option value="#" disabled selected> Select Departemnt</option>
-          <option value="bsc"> Bachelor of Science </option>
-          <option value="bca"> Bachelor of Computer Application </option>
-          <option value="bcom"> Bachelor of Commerce</option>
-        </select><br><br>
+        <div class="col-md-4">
+          <label class="form-label">Department :</label>
+          <select class="form-select" id="departmentSelect" name="departmentId" required>
+            <option value="" selected disabled>Select Department</option>
+            <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
+          </select>
+        </div>
+
         <div class="d-flex justify-content-center mt-4" style="color: E5989B;">
           <button style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button>
 
@@ -63,7 +72,26 @@
         }
       });
     </script>
+
+    
+
   </div>
+
+  <div class="container bg-white rounded shadow-lg p-2  mx-1">
+    <div class="section-title">ALL COURSES</div>
+
+      <div class=" shadow-sm lead-card" th:each="course : ${courses}">
+          <div class="lead-info">
+            <div class="lead-text">
+              <div><h5><strong>Code : </strong><span th:text="${course.code}">8765764</span></h5></div>
+              <div><h5><strong>Name : </strong><span th:text="${course.name}">Advanced Database</span></h5></div>
+              <div><h5><strong>Department:</strong><span th:text="${course.department.name}">Science</span></h5></div>
+            </div>
+          </div>
+        </div>
+  </div>
+
+    
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script th:src="@{/main.js}"></script>

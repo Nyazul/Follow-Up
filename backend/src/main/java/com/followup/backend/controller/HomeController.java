@@ -967,10 +967,64 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        List<Course> courses = courseRepository.findAll();
+        courses.forEach(course -> {
+            course.getDepartment();
+        });
+
         model.addAttribute("user", user);
+        model.addAttribute("departments", departments);
+        model.addAttribute("courses", courses);
 
         return "add-course";
 
+    }
+
+    @PostMapping("/course/add")
+    public String addCourse(@RequestParam Long courseCode,
+                            @RequestParam String courseName,
+                            @RequestParam Long departmentId,
+                            HttpSession session,
+                            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        Department department = departmentRepository.findById(departmentId).orElse(null);
+        if (department == null) {
+            redirAttrs.addFlashAttribute("error", "Department not found");
+            return "redirect:/master/course";
+        }
+
+        Course course = new Course();
+        course.setCode(courseCode);
+        course.setName(courseName);
+        course.setDepartment(department);
+        course.setCreatedAt(LocalDateTime.now());
+        course.setUpdatedAt(LocalDateTime.now());
+        course.setDeleted(false);
+
+
+        courseRepository.save(course);
+
+        redirAttrs.addFlashAttribute("message", "Course added successfully");
+        return "redirect:/master/course";
     }
 
     @GetMapping("/master/department")
