@@ -12,7 +12,11 @@
   padding-top: 60px;
   transition: all 0.3s ease-in-out;
   z-index: 1030;
+
+  display: flex;
+  flex-direction: column;
 }
+
 
 .sidebar .nav-link {
   color: #333;
@@ -246,5 +250,27 @@ body {
     align-self: flex-end;
   }
 }
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+
+
+
 
 /* FollowUp - End */

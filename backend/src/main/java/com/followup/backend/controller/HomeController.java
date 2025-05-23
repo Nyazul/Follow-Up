@@ -1,6 +1,5 @@
 package com.followup.backend.controller;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +33,9 @@ import jakarta.transaction.Transactional;
 public class HomeController {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private AdminRepository adminRepository;
 
     @Autowired
@@ -56,6 +58,10 @@ public class HomeController {
 
     @Autowired
     private LeadRepository leadRepository;
+
+    HomeController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/")
     public String landingPage() {
@@ -80,7 +86,7 @@ public class HomeController {
             if (user != null) {
                 session.setAttribute("userEmail", user.getEmail());
                 session.setAttribute("userRole", user.getRole());
-                return "redirect:/admin-pannel";
+                return "redirect:/admin-dashboard";
             }
         } else {
             FollowUpEmployee user = followUpEmployeeRepository.findByEmailAndPassword(email, password);
@@ -575,8 +581,8 @@ public class HomeController {
         return "completed-followup-details";
     }
 
-    @GetMapping("/admin-pannel")
-    public String adminPannel(HttpSession session, RedirectAttributes redirAttrs) {
+    @GetMapping("/admin-dashboard")
+    public String adminDashboard(HttpSession session, RedirectAttributes redirAttrs, Model model) {
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
 
@@ -585,8 +591,57 @@ public class HomeController {
             return "redirect:/login";
         }
 
-        // Optional: fetch and pass admin user if needed
-        return "admin-pannel";
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        // count of all employees
+        long totalEmployees = basicEmployeeRepository.count() + followUpEmployeeRepository.count();
+        model.addAttribute("totalEmployees", totalEmployees);
+
+        // count of followups completed this week
+        long completedFollowUpsThisWeek = followUpRepository
+                .findByCreatedAtAfter(LocalDate.now().minusDays(7).atStartOfDay())
+                .stream()
+                .filter(f -> f.getStatus() == FollowUp.Status.COMPLETED)
+                .count();
+
+        model.addAttribute("completedThisWeek", completedFollowUpsThisWeek);
+
+        // count of remaining followups today
+        long remainingFollowUpsToday = followUpRepository
+                .findByCreatedAtAfter(LocalDate.now().atStartOfDay())
+                .stream()
+                .filter(f -> f.getStatus() == FollowUp.Status.PENDING || f.getStatus() == FollowUp.Status.IN_PROGRESS ||
+                        f.getStatus() == FollowUp.Status.OVERDUE)
+                .count();
+
+        model.addAttribute("remainingToday", remainingFollowUpsToday);
+
+        // count of total tasks not completed by all users
+        long totalTasksNotCompleted = 0;
+        for (User user2 : userRepository.findAll()) {
+            totalTasksNotCompleted += user2.getTasks().stream().filter(t -> !t.isCompleted()).count();
+        }
+
+        model.addAttribute("totalTasks", totalTasksNotCompleted);
+
+        List<FollowUp> last12MonthsFollowUps = followUpRepository
+                .findByCreatedAtAfter(LocalDate.now().minusMonths(12).atStartOfDay());
+
+
+        List<FollowUpTrendDTO> followUpTrends = last12MonthsFollowUps.stream()
+                .map(f -> new FollowUpTrendDTO(
+                        f.getUpdatedAt().toLocalDate(),
+                        f.getStatus() == FollowUp.Status.COMPLETED ? 1 : 0))
+                .toList();
+
+        model.addAttribute("followUpTrends", followUpTrends);
+
+        model.addAttribute("user", user);
+        return "admin-dashboard";
     }
 
     @GetMapping("/task")
@@ -609,7 +664,7 @@ public class HomeController {
 
             List<Task> tasks = new ArrayList<>(user.getTasks().stream().filter(t -> !t.isCompleted()).toList());
             tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
-            
+
             model.addAttribute("tasks", tasks);
             model.addAttribute("user", user);
         } else if (role.equals("FOLLOWUP_EMPLOYEE")) {
@@ -638,6 +693,143 @@ public class HomeController {
         }
 
         return "task";
+    }
+
+    @GetMapping("/task/complete/{id}")
+    public String completeTask(@PathVariable Long id, HttpSession session, RedirectAttributes redirAttrs, Model model) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null
+                || (!role.equals("FOLLOWUP_EMPLOYEE") && !role.equals("ADMIN") && !role.equals("BASIC_EMPLOYEE"))) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        if (role.equals("ADMIN")) {
+            Admin user = adminRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+
+            Task task = user.getTasks().stream().filter(t -> t.getId() == id).findFirst().orElse(null);
+            if (task == null) {
+                redirAttrs.addFlashAttribute("error", "Task not found");
+                return "redirect:/task";
+            }
+            task.setCompleted(true);
+            task.setUpdatedAt(LocalDateTime.now());
+            user.getTasks().remove(task);
+            adminRepository.save(user);
+
+            model.addAttribute("user", user);
+        } else if (role.equals("FOLLOWUP_EMPLOYEE")) {
+            FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+
+            Task task = user.getTasks().stream().filter(t -> t.getId() == id).findFirst().orElse(null);
+            if (task == null) {
+                redirAttrs.addFlashAttribute("error", "Task not found");
+                return "redirect:/task";
+            }
+            task.setCompleted(true);
+            task.setUpdatedAt(LocalDateTime.now());
+            user.getTasks().remove(task);
+            followUpEmployeeRepository.save(user);
+
+            model.addAttribute("user", user);
+        } else if (role.equals("BASIC_EMPLOYEE")) {
+            BasicEmployee user = basicEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            Task task = user.getTasks().stream().filter(t -> t.getId() == id).findFirst().orElse(null);
+            if (task == null) {
+                redirAttrs.addFlashAttribute("error", "Task not found");
+                return "redirect:/task";
+            }
+            task.setCompleted(true);
+            task.setUpdatedAt(LocalDateTime.now());
+            user.getTasks().remove(task);
+            basicEmployeeRepository.save(user);
+
+            model.addAttribute("user", user);
+        }
+        redirAttrs.addFlashAttribute("message", "Task completed");
+        return "redirect:/task";
+    }
+
+    @PostMapping("/task/add")
+    public String addTask(@RequestParam("title") String title,
+            @RequestParam("body") String body,
+            @RequestParam("dueDate") LocalDate dueDate,
+            HttpSession session,
+            RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+        if (email == null || role == null
+                || (!role.equals("FOLLOWUP_EMPLOYEE") && !role.equals("ADMIN") && !role.equals("BASIC_EMPLOYEE"))) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        if (role.equals("ADMIN")) {
+            Admin user = adminRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            Task task = new Task();
+            task.setTitle(title);
+            task.setBody(body);
+            task.setDueDate(dueDate.atStartOfDay());
+            task.setCreatedAt(LocalDateTime.now());
+            task.setUpdatedAt(LocalDateTime.now());
+            task.setCompleted(false);
+            task.setUser(user);
+            user.getTasks().add(task);
+            adminRepository.save(user);
+        } else if (role.equals("FOLLOWUP_EMPLOYEE")) {
+            FollowUpEmployee user = followUpEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            Task task = new Task();
+            task.setTitle(title);
+            task.setBody(body);
+            task.setDueDate(dueDate.atStartOfDay());
+            task.setCreatedAt(LocalDateTime.now());
+            task.setUpdatedAt(LocalDateTime.now());
+            task.setCompleted(false);
+            task.setUser(user);
+            user.getTasks().add(task);
+            followUpEmployeeRepository.save(user);
+        } else if (role.equals("BASIC_EMPLOYEE")) {
+            BasicEmployee user = basicEmployeeRepository.findByEmail(email);
+            if (user == null) {
+                redirAttrs.addFlashAttribute("error", "User not found");
+                return "redirect:/login";
+            }
+            Task task = new Task();
+            task.setTitle(title);
+            task.setBody(body);
+            task.setDueDate(dueDate.atStartOfDay());
+            task.setCreatedAt(LocalDateTime.now());
+            task.setUpdatedAt(LocalDateTime.now());
+            task.setCompleted(false);
+            task.setUser(user);
+            user.getTasks().add(task);
+            basicEmployeeRepository.save(user);
+        }
+
+        redirAttrs.addFlashAttribute("message", "Task added successfully");
+        return "redirect:/task";
     }
 
     @GetMapping("/data")
@@ -704,7 +896,7 @@ public class HomeController {
 
         List<FollowUpTrendDTO> followUpTrends = last12MonthsFollowUps.stream()
                 .map(f -> new FollowUpTrendDTO(
-                        f.getCreatedAt().toLocalDate(),
+                        f.getUpdatedAt().toLocalDate(),
                         f.getStatus() == FollowUp.Status.COMPLETED ? 1 : 0))
                 .toList();
 
@@ -827,4 +1019,10 @@ public class HomeController {
 
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpSession session, RedirectAttributes redirAttrs) {
+        session.invalidate();
+        redirAttrs.addFlashAttribute("message", "Logged out successfully");
+        return "redirect:/login";
+    }
 }
