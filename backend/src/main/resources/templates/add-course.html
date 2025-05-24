@@ -52,28 +52,7 @@
           <button style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button>
 
       </form>
-    </div>
-    <script>
-
-      // Add Course
-      const courseForm = document.getElementById('courseForm');
-      const courseInput = document.getElementById('courseInput');
-      const courseList = document.getElementById('courseList');
-
-      courseForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const courseName = courseInput.value.trim();
-        if (courseName) {
-          const li = document.createElement('li');
-          li.className = 'list-group-item d-flex align-items-center';
-          li.innerHTML = `<i class="bi bi-journal-bookmark-fill me-2 text-success"></i> ${courseName}`;
-          courseList.appendChild(li);
-          courseInput.value = '';
-        }
-      });
-    </script>
-
-    
+    </div>    
 
   </div>
 
