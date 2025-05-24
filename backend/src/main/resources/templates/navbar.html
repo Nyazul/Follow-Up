@@ -12,7 +12,7 @@
           >
             <i class="bi bi-list"></i>
           </button>
-          <span class="navbar-brand mb-0 h1" th:text="${user.name}"
+          <span class="navbar-brand mb-0 h1 fs-4 fw-bolder text-primary" th:text="${user.name}"
             >Username</span
           >
         </div>
@@ -20,7 +20,7 @@
 
       <!-- Sidebar -->
       <div class="sidebar" id="sidebar">
-        <h5 class="text-center mb-4" th:text="${user.name}">Username</h5>
+        <h5 class="text-center mb-4 fs-4 fw-bolder text-primary" th:text="${user.name}">Username</h5>
 
         <div class="sidebar-content">
           <div class="accordion" id="adminSidebar">
@@ -140,7 +140,7 @@
               <h2 class="accordion-header" id="taskManagementHeading">
                 <button
                   class="accordion-button d-flex justify-content-between align-items-center"
-                  th:classappend="${activePage != 'assign-task' and activePage != 'show-task'} ? ' collapsed' : ''"
+                  th:classappend="${activePage != 'assign-task' and activePage != 'show-task'} ? 'collapsed' : ''"
                   type="button"
                   data-bs-toggle="collapse"
                   data-bs-target="#taskManagementCollapse"
@@ -151,20 +151,20 @@
               <div
                 id="taskManagementCollapse"
                 class="accordion-collapse"
-                th:classappend="${activePage == 'assign-task' or activePage == 'show-task'} ? ' show' : ' collapse'"
+                th:classappend="${activePage != 'assign-task' and activePage != 'show-task'} ? 'collapse' : 'show'"
                 data-bs-parent="#adminSidebar"
               >
                 <div class="accordion-body p-0">
                   <a
                     th:href="@{/master/assigntask}"
                     class="nav-link ps-5 py-2"
-                    th:classappend="${activePage} == 'assign-task' ? ' active' : ''"
+                    th:classappend="${activePage} == 'assign-task' ? 'active' : ''"
                     >Assign Task</a
                   >
                   <a
                     th:href="@{/master/showtask}"
                     class="nav-link ps-5 py-2"
-                    th:classappend="${activePage} == 'show-task' ? ' active' : ''"
+                    th:classappend="${activePage} == 'show-task' ? 'active' : ''"
                     >Show Task</a
                   >
                 </div>
