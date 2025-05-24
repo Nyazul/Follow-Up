@@ -7,4 +7,6 @@ import com.followup.backend.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    User findByEmail(String email);
 }

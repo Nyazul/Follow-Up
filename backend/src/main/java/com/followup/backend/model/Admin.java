@@ -9,8 +9,8 @@ import lombok.ToString;
 public class Admin extends User {
 
 
-    @Column(name = "is_super", nullable = false)
-    private boolean isSuper;
+    @Column(name = "is_super", nullable = true)
+    private boolean isSuper= false;
 
     @Override
     public String getRole() {
