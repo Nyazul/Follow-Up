@@ -979,7 +979,7 @@ public class HomeController {
 
         model.addAttribute("user", user);
         model.addAttribute("departments", departments);
-        model.addAttribute("courses", courses);
+        model.addAttribute("courses", courses); 
 
         return "add-course";
 
