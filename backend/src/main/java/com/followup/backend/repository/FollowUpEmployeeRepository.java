@@ -12,4 +12,6 @@ public interface FollowUpEmployeeRepository extends JpaRepository<FollowUpEmploy
 
     FollowUpEmployee findByEmail(String email);
 
+    FollowUpEmployee existsByEmail(String email);
+
 }

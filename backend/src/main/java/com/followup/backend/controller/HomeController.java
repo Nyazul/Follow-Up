@@ -1005,13 +1005,7 @@ public class HomeController {
             redirAttrs.addFlashAttribute("error", "User not found");
             return "redirect:/login";
         }
-
         Department department = departmentRepository.findById(departmentId).orElse(null);
-        if (department == null) {
-            redirAttrs.addFlashAttribute("error", "Department not found");
-            return "redirect:/master/course";
-        }
-
         Course course = new Course();
         course.setCode(courseCode);
         course.setName(courseName);
@@ -1067,11 +1061,54 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        model.addAttribute("departments", departments);
+
         model.addAttribute("user", user);
 
         return "add-employee";
 
     }
+
+    @PostMapping("/employee/add")
+    public String addEmployee(@ModelAttribute("followUpEmployee") FollowUpEmployee followUpEmployee,
+                            HttpSession session,
+                            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+        
+        followUpEmployee.setCreatedAt(LocalDateTime.now());
+        followUpEmployee.setUpdatedAt(LocalDateTime.now());
+        followUpEmployee.setDeleted(false);
+        //check if email already exists
+        User user2 = userRepository.findByEmail(followUpEmployee.getEmail());
+        if (user2 != null) {
+            redirAttrs.addFlashAttribute("error", "Email already exists");
+            return "redirect:/master/employee";
+        }
+
+        followUpEmployeeRepository.save(followUpEmployee);
+
+        redirAttrs.addFlashAttribute("message", "Employee added successfully");
+        return "redirect:/master/employee";
+    }
+    
 
     @GetMapping("/master/assigntask")
     public String showMasterAssignTaskPage(HttpSession session, Model model, RedirectAttributes redirAttrs) {
