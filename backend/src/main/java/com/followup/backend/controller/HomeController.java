@@ -1111,6 +1111,14 @@ public class HomeController {
         department.setUpdatedAt(LocalDateTime.now());
         departmentRepository.save(department);
 
+        // Remove the department from all employees
+        followUpEmployeeRepository.findAll().forEach(employee -> {
+            if (employee.getDepartment() != null && employee.getDepartment().getId() == id) {
+                employee.setDeleted(true);
+                followUpEmployeeRepository.save(employee);
+            }
+        });
+
         redirAttrs.addFlashAttribute("message", "Department deleted successfully");
         return "redirect:/master/department";
     }
@@ -1140,8 +1148,6 @@ public class HomeController {
         
         List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
         employees.forEach(employee -> {
-
-           
                 employee.getDepartment().getName();
             
         });
@@ -1155,7 +1161,8 @@ public class HomeController {
     }
 
     @PostMapping("/employee/add")
-    public String addEmployee(@ModelAttribute("followUpEmployee") FollowUpEmployee followUpEmployee,
+    public String addEmployee(@ModelAttribute("followUpEmployee") FollowUpEmployee followUpEmployee, 
+            @RequestParam Long departmentId,
             HttpSession session,
             RedirectAttributes redirAttrs) {
 
@@ -1183,6 +1190,13 @@ public class HomeController {
             return "redirect:/master/employee";
         }
 
+        Department department = departmentRepository.findById(departmentId).orElse(null);
+        if (department == null) {
+            redirAttrs.addFlashAttribute("error", "Department not found");
+            return "redirect:/master/employee";
+        }
+
+        followUpEmployee.setDepartment(department);
         followUpEmployeeRepository.save(followUpEmployee);
 
         redirAttrs.addFlashAttribute("message", "Employee added successfully");
