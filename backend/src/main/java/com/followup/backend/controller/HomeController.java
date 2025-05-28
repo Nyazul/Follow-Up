@@ -1066,6 +1066,15 @@ public class HomeController {
                 .map(d -> new DepartmentDTO(d.getId(), d.getName()))
                 .toList();
 
+        
+        List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
+        employees.forEach(employee -> {
+
+           
+                employee.getDepartment().getName();
+            
+        });
+        model.addAttribute("employees", employees);
         model.addAttribute("departments", departments);
 
         model.addAttribute("user", user);
