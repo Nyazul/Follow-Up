@@ -40,7 +40,6 @@
         <!-- Time Range Selector -->
         <div class="row mb-3">
           <div class="col-md-4">
-            
             <select id="timeRange" class="form-select">
               <option value="week" selected>This Week</option>
               <option value="month">This Month</option>
@@ -88,24 +87,13 @@
             </div>
           </div>
         </div>
-
-    
       </div>
 
       <!-- Chart.js CDN -->
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script th:inline="javascript">
         function groupDataByRange(data, range) {
-          const result = {};
-          const weekdayOrder = [
-            "Sun",
-            "Mon",
-            "Tue",
-            "Wed",
-            "Thu",
-            "Fri",
-            "Sat",
-          ];
+          const weekdayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri"]; // Removed Sat, Sun
           const monthOrder = [
             "Jan",
             "Feb",
@@ -120,13 +108,33 @@
             "Nov",
             "Dec",
           ];
+          const result = {};
 
+          // Initialize keys with 0
+          switch (range) {
+            case "week":
+              weekdayOrder.forEach((day) => (result[day] = 0));
+              break;
+            case "month":
+              for (let i = 1; i <= 5; i++) result[`Week ${i}`] = 0;
+              break;
+            case "year":
+              monthOrder.forEach((month) => (result[month] = 0));
+              break;
+          }
+
+          // Populate data
           data.forEach((entry) => {
             const date = new Date(entry.date);
             let key;
+
             switch (range) {
               case "week":
-                key = date.toLocaleDateString("en-US", { weekday: "short" });
+                const day = date.toLocaleDateString("en-US", {
+                  weekday: "short",
+                });
+                if (!weekdayOrder.includes(day)) return; // Skip Sat & Sun
+                key = day;
                 break;
               case "month":
                 key = `Week ${Math.ceil(date.getDate() / 7)}`;
@@ -135,18 +143,22 @@
                 key = date.toLocaleDateString("en-US", { month: "short" });
                 break;
             }
-            result[key] = (result[key] || 0) + entry.completed;
+
+            if (result.hasOwnProperty(key)) {
+              result[key] += entry.completed;
+            } else {
+              result[key] = entry.completed;
+            }
           });
 
+          // Ensure keys are ordered
           let sortedKeys;
-          if (range === "week")
-            sortedKeys = weekdayOrder.filter((day) => day in result);
-          else if (range === "year")
-            sortedKeys = monthOrder.filter((month) => month in result);
-          else sortedKeys = Object.keys(result).sort();
+          if (range === "week") sortedKeys = weekdayOrder;
+          else if (range === "year") sortedKeys = monthOrder;
+          else sortedKeys = [`Week 1`, `Week 2`, `Week 3`, `Week 4`, `Week 5`];
 
           const sortedResult = {};
-          sortedKeys.forEach((k) => (sortedResult[k] = result[k]));
+          sortedKeys.forEach((k) => (sortedResult[k] = result[k] || 0));
           return sortedResult;
         }
 
@@ -203,7 +215,7 @@
           }
         }
 
-        let followUpTrend = /*[[${followUpTrends}]]*/[];
+        let followUpTrend = /*[[${followUpTrends}]]*/ [];
         document.addEventListener("DOMContentLoaded", () => {
           renderChart(
             followUpTrend,

@@ -115,7 +115,7 @@
 
       function groupData(data, range) {
         const result = {};
-        const weekdayOrder = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const weekdayOrder = ["Mon", "Tue", "Wed", "Thu", "Fri"]; // exclude Sat & Sun
         const monthOrder = [
           "Jan",
           "Feb",
@@ -130,14 +130,29 @@
           "Nov",
           "Dec",
         ];
+        const weeksInMonth = ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"];
 
+        // Initialize result with zero values
+        if (range === "week") {
+          weekdayOrder.forEach((day) => (result[day] = 0));
+        } else if (range === "month") {
+          weeksInMonth.forEach((week) => (result[week] = 0));
+        } else if (range === "year") {
+          monthOrder.forEach((month) => (result[month] = 0));
+        }
+
+        // Count actual data
         data.forEach((entry) => {
           const date = new Date(entry.date);
           let key;
 
           switch (range) {
             case "week":
-              key = date.toLocaleDateString("en-US", { weekday: "short" });
+              const day = date.toLocaleDateString("en-US", {
+                weekday: "short",
+              });
+              if (!weekdayOrder.includes(day)) return; // skip Sat & Sun
+              key = day;
               break;
             case "month":
               key = `Week ${Math.ceil(date.getDate() / 7)}`;
@@ -147,16 +162,22 @@
               break;
           }
 
-          result[key] = (result[key] || 0) + 1;
+          if (result.hasOwnProperty(key)) {
+            result[key]++;
+          } else {
+            result[key] = 1; // fallback (just in case)
+          }
         });
 
-        let keys;
-        if (range === "week") keys = weekdayOrder.filter((k) => k in result);
-        else if (range === "year") keys = monthOrder.filter((k) => k in result);
-        else keys = Object.keys(result).sort();
+        // Determine the correct order
+        let orderedKeys;
+        if (range === "week") orderedKeys = weekdayOrder;
+        else if (range === "month") orderedKeys = weeksInMonth;
+        else orderedKeys = monthOrder;
 
+        // Build sorted result
         const sorted = {};
-        keys.forEach((k) => (sorted[k] = result[k]));
+        orderedKeys.forEach((k) => (sorted[k] = result[k] || 0));
         return sorted;
       }
 
@@ -226,7 +247,16 @@
               div.onclick = () => {
                 window.location.href = `/completed-followup/${followUp.id}`;
               };
-              div.classList.add("border-bottom", "pb-3", "mb-3", "container", "rounded", "shadow", "cursor-pointer", "hover-effect");
+              div.classList.add(
+                "border-bottom",
+                "pb-3",
+                "mb-3",
+                "container",
+                "rounded",
+                "shadow",
+                "cursor-pointer",
+                "hover-effect"
+              );
               div.innerHTML = `
             <div class="row hover">
               <div class="col-md-4"><strong>Lead : </strong> ${
