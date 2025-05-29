@@ -1140,9 +1140,7 @@ public class HomeController {
         
         List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
         employees.forEach(employee -> {
-
-           
-                employee.getDepartment().getName();
+            employee.getDepartment().getName();
             
         });
         model.addAttribute("employees", employees);
