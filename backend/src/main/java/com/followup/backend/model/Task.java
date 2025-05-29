@@ -1,5 +1,6 @@
 package com.followup.backend.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,7 +35,7 @@ public class Task {
     private String body;
 
     @Column(name = "due_date", nullable = false)
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
 
     //Forign key to User
     @ManyToOne(fetch = FetchType.LAZY)

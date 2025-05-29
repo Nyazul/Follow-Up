@@ -269,6 +269,12 @@ body {
   height: 100vh;
 }
 
+.employee-card.selected {
+  border: 2px solid #e5989b; /* matches your button color */
+  box-shadow: 0 0 10px rgba(229, 152, 155, 0.5);
+  background-color: #fff0f1;
+}
+
 
 
 
