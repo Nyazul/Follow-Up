@@ -14,19 +14,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.followup.backend.dto.AddFollowUpFormDTO;
-import com.followup.backend.dto.CourseDTO;
-import com.followup.backend.dto.DepartmentDTO;
-import com.followup.backend.dto.EditLeadDetailsDTO;
-import com.followup.backend.dto.EmployeeReportDTO;
-import com.followup.backend.dto.EmployeeSummaryDTO;
-import com.followup.backend.dto.FollowUpTrendDTO;
-import com.followup.backend.dto.NewFollowUpFormDTO;
+import com.followup.backend.dto.*;
 import com.followup.backend.model.*;
 import com.followup.backend.repository.*;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequestMapping
@@ -58,6 +54,9 @@ public class HomeController {
 
     @Autowired
     private LeadRepository leadRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     HomeController(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -787,7 +786,7 @@ public class HomeController {
             Task task = new Task();
             task.setTitle(title);
             task.setBody(body);
-            task.setDueDate(dueDate.atStartOfDay());
+            task.setDueDate(dueDate);
             task.setCreatedAt(LocalDateTime.now());
             task.setUpdatedAt(LocalDateTime.now());
             task.setCompleted(false);
@@ -803,7 +802,7 @@ public class HomeController {
             Task task = new Task();
             task.setTitle(title);
             task.setBody(body);
-            task.setDueDate(dueDate.atStartOfDay());
+            task.setDueDate(dueDate);
             task.setCreatedAt(LocalDateTime.now());
             task.setUpdatedAt(LocalDateTime.now());
             task.setCompleted(false);
@@ -819,7 +818,7 @@ public class HomeController {
             Task task = new Task();
             task.setTitle(title);
             task.setBody(body);
-            task.setDueDate(dueDate.atStartOfDay());
+            task.setDueDate(dueDate);
             task.setCreatedAt(LocalDateTime.now());
             task.setUpdatedAt(LocalDateTime.now());
             task.setCompleted(false);
@@ -1005,13 +1004,7 @@ public class HomeController {
             redirAttrs.addFlashAttribute("error", "User not found");
             return "redirect:/login";
         }
-
         Department department = departmentRepository.findById(departmentId).orElse(null);
-        if (department == null) {
-            redirAttrs.addFlashAttribute("error", "Department not found");
-            return "redirect:/master/course";
-        }
-
         Course course = new Course();
         course.setCode(courseCode);
         course.setName(courseName);
@@ -1043,10 +1036,83 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<Department> departments = departmentRepository.findAll().stream()
+                .filter(d -> !d.isDeleted())
+                .toList();
+
         model.addAttribute("user", user);
+        
+        model.addAttribute("departments", departments);
 
         return "add-department";
 
+    }
+
+
+    @PostMapping("/department/add")
+    public String addDepartment(@RequestParam String departmentName,
+            HttpSession session,
+            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        Department department = new Department();
+        department.setName(departmentName);
+        department.setCreatedAt(LocalDateTime.now());
+        department.setUpdatedAt(LocalDateTime.now());
+        department.setDeleted(false);
+
+        departmentRepository.save(department);
+
+        redirAttrs.addFlashAttribute("message", "Department added successfully");
+        return "redirect:/master/department";
+    }
+
+
+    @RequestMapping("/department/delete/{id}")
+    public String deleteDepartment(@PathVariable Long id, HttpSession session, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        Department department = departmentRepository.findById(id).orElse(null);
+
+        department.setDeleted(true);
+        department.setUpdatedAt(LocalDateTime.now());
+        departmentRepository.save(department);
+
+        // Remove the department from all employees
+        followUpEmployeeRepository.findAll().forEach(employee -> {
+            if (employee.getDepartment() != null && employee.getDepartment().getId() == id) {
+                employee.setDeleted(true);
+                followUpEmployeeRepository.save(employee);
+            }
+        });
+
+        redirAttrs.addFlashAttribute("message", "Department deleted successfully");
+        return "redirect:/master/department";
     }
 
     @GetMapping("/master/employee")
@@ -1066,10 +1132,69 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        
+        List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
+        employees.forEach(employee -> {
+
+           
+                employee.getDepartment().getName();
+            
+        });
+        model.addAttribute("employees", employees);
+        model.addAttribute("departments", departments);
+
         model.addAttribute("user", user);
 
         return "add-employee";
 
+    }
+
+    @PostMapping("/employee/add")
+    public String addEmployee(@ModelAttribute("followUpEmployee") FollowUpEmployee followUpEmployee, 
+            @RequestParam Long departmentId,
+            HttpSession session,
+            RedirectAttributes redirAttrs) {
+
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        followUpEmployee.setCreatedAt(LocalDateTime.now());
+        followUpEmployee.setUpdatedAt(LocalDateTime.now());
+        followUpEmployee.setDeleted(false);
+        // check if email already exists
+        User user2 = userRepository.findByEmail(followUpEmployee.getEmail());
+        if (user2 != null) {
+            redirAttrs.addFlashAttribute("error", "Email already exists");
+            return "redirect:/master/employee";
+        }
+
+        Department department = departmentRepository.findById(departmentId).orElse(null);
+        if (department == null) {
+            redirAttrs.addFlashAttribute("error", "Department not found");
+            return "redirect:/master/employee";
+        }
+
+        followUpEmployee.setDepartment(department);
+        followUpEmployeeRepository.save(followUpEmployee);
+
+        redirAttrs.addFlashAttribute("message", "Employee added successfully");
+        return "redirect:/master/employee";
     }
 
     @GetMapping("/master/assigntask")
@@ -1089,6 +1214,39 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<DepartmentDTO> departments = departmentRepository.findAll()
+                .stream()
+                .map(d -> new DepartmentDTO(d.getId(), d.getName()))
+                .toList();
+
+        List<FollowUpEmployee> employees = followUpEmployeeRepository.findAll();
+        List<EmployeeSummaryDTO> employeeSummaries = employees.stream()
+                .map(e -> {
+                    long todayCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isEqual(LocalDate.now()))
+                            .count();
+
+                    long weeklyCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusDays(6)))
+                            .count();
+
+                    long monthlyCount = e.getCompletedFollowUps().stream()
+                            .filter(f -> f.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusDays(30)))
+                            .count();
+
+                    return new EmployeeSummaryDTO(
+                            e.getId(),
+                            e.getName(),
+                            e.getDepartment() != null ? e.getDepartment().getName() : "N/A",
+                            todayCount,
+                            weeklyCount,
+                            monthlyCount,
+                            e.getDepartment() != null ? e.getDepartment().getId() : null);
+                })
+                .toList();
+
+        model.addAttribute("employeeSummaries", employeeSummaries);
+        model.addAttribute("departments", departments);
         model.addAttribute("user", user);
 
         return "assign-task";
@@ -1112,9 +1270,81 @@ public class HomeController {
             return "redirect:/login";
         }
 
+        List<Task> tasks = taskRepository.findAll();
+        tasks.forEach(task -> {
+            task.getUser();
+        });
+
+        tasks.sort((t1, t2) -> t1.getDueDate().compareTo(t2.getDueDate()));
+        model.addAttribute("tasks", tasks);
         model.addAttribute("user", user);
 
         return "show-task";
+
+    }
+
+    @RequestMapping("/task/delete/{id}")
+    public String deleteTask(@PathVariable Long id, HttpSession session, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || role == null
+                || (!role.equals("FOLLOWUP_EMPLOYEE") && !role.equals("ADMIN") && !role.equals("BASIC_EMPLOYEE"))) {
+            redirAttrs.addFlashAttribute("error", "Please login first");
+            return "redirect:/login";
+        }
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        Task task = taskRepository.findAll().stream().filter(t -> t.getId() == id).findFirst().orElse(null);
+        if (task == null) {
+            redirAttrs.addFlashAttribute("error", "Task not found");
+            return "redirect:/task";
+        }
+        task.getUser().getTasks().remove(task);
+        userRepository.save(user);
+        taskRepository.delete(task);
+        redirAttrs.addFlashAttribute("message", "Task deleted successfully");
+        return "redirect:/master/showtask";
+    }
+
+    @PostMapping("/task/assign")
+    public String assignTask(@ModelAttribute("task") Task task,
+            @RequestParam("employeeId") Long employeeId,
+            HttpSession session,
+            RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee employee = followUpEmployeeRepository.findById(employeeId).orElse(null);
+        
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        task.setCompleted(false);
+        task.setUser(employee);
+
+        employee.getTasks().add(task);
+        followUpEmployeeRepository.save(employee);
+        taskRepository.save(task);
+
+
+        redirAttrs.addFlashAttribute("message", "Task assigned successfully");
+        return "redirect:/master/showtask";
 
     }
 
