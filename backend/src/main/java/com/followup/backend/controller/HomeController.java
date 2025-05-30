@@ -1338,7 +1338,6 @@ public class HomeController {
 
         employee.getTasks().add(task);
         followUpEmployeeRepository.save(employee);
-        taskRepository.save(task);
 
 
         redirAttrs.addFlashAttribute("message", "Task assigned successfully");
