@@ -17,16 +17,15 @@
   flex-direction: column;
 }
 
-
-
 .sidebar .nav-link {
   color: white;
   font-weight: 500;
+  background-color: #203354;
 }
 
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
-  background-color: #1261A0;
+  background-color: #1261a0;
   color: white;
 }
 
@@ -57,8 +56,28 @@
 }
 
 .accordion-button:not(.collapsed) {
-  background-color: #1261A0;
-  color: white;
+  background-color: #1261a0;
+  color: rgb(255, 251, 251);
+}
+
+#masterHeading .accordion-button:not(.collapsed)::after,
+#masterHeading .accordion-button.collapsed::after {
+  filter: brightness(0) invert(1);
+}
+
+/* White dropdown caret for Master */
+#masterHeading .accordion-button::after {
+  filter: brightness(0) invert(1);
+}
+
+/* White dropdown caret for Follow Up */
+#followUpHeading .accordion-button::after {
+  filter: brightness(0) invert(1);
+}
+
+/* White dropdown caret for Task Management */
+#taskManagementHeading .accordion-button::after {
+  filter: brightness(0) invert(1);
 }
 
 .sidebar-overlay {
@@ -131,25 +150,22 @@
 }
 
 .hover-effect:hover {
-    transition: all 0.3s ease-in-out;
-    transform: scale(1.05);
+  transition: all 0.3s ease-in-out;
+  transform: scale(1.05);
   background-color: #203354; /* Light gray */
   color: white;
 }
-#ffcdb2
-.hover-effect {
-    transition: all 0.3s ease-in-out;
+#ffcdb2 .hover-effect {
+  transition: all 0.3s ease-in-out;
 }
 
-
 .sidebar .text-primary {
-  color: white!important;
+  color: white !important;
 }
 
 .text-primary {
   color: #192841 !important;
 }
-
 
 /* Remaining FollowUp */
 
@@ -282,9 +298,5 @@ body {
   box-shadow: 0 0 10px rgba(229, 152, 155, 0.5);
   background-color: #fff0f1;
 }
-
-
-
-
 
 /* FollowUp - End */
