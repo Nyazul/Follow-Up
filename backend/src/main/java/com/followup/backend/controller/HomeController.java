@@ -1142,7 +1142,7 @@ public class HomeController {
         employees.forEach(employee -> {
 
            
-                employee.getDepartment().getName();
+                employee.getDepartment();
             
         });
         model.addAttribute("employees", employees);

@@ -85,8 +85,8 @@
 
     
     <div class="d-flex justify-content-center mt-4">
-      <button style="background-color: rgb(229, 152, 155);" class="btn me-4">Add</button><br>
-      <button style="background-color: rgb(229, 152, 155);" class="btn">Cancel</button>
+      <button style="background-color: #203354; color: white" class="btn me-4">Add</button><br>
+      <button style="background-color: #203354; color: white;" class="btn">Cancel</button>
     </div>
   </form>
   </div>
@@ -100,7 +100,7 @@
       <div class="lead-info">
         <div class="lead-text">
           <div><h5><strong>Name: </strong><span th:text="${employee.name}">John Doe</span></h5></div>
-          <div><h5><strong>Department: </strong><span th:text="${employee.department.name}">HR</span></h5></div>
+          <div><h5><strong>Department: </strong><span th:text="${employee.department}">HR</span></h5></div>
           <div><h5><strong>Address: </strong><span th:text="${employee.address}">123 Main St</span></h5></div>
           <div><h5><strong>Phone: </strong><span th:text="${employee.phoneNumber}">1234567890</span></h5></div>
           <div><h5><strong>Email: </strong><span th:text="${employee.email}"></div>
