@@ -987,10 +987,10 @@ public class HomeController {
 
     @PostMapping("/course/add")
     public String addCourse(@RequestParam Long courseCode,
-                            @RequestParam String courseName,
-                            @RequestParam Long departmentId,
-                            HttpSession session,
-                            RedirectAttributes redirAttrs) {
+            @RequestParam String courseName,
+            @RequestParam Long departmentId,
+            HttpSession session,
+            RedirectAttributes redirAttrs) {
 
         String email = (String) session.getAttribute("userEmail");
         String role = (String) session.getAttribute("userRole");
@@ -1019,7 +1019,6 @@ public class HomeController {
         course.setCreatedAt(LocalDateTime.now());
         course.setUpdatedAt(LocalDateTime.now());
         course.setDeleted(false);
-
 
         courseRepository.save(course);
 
