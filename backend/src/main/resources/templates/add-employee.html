@@ -123,6 +123,10 @@
             <p class="fs-6 mb-1"><strong>Phone:</strong> <span th:text="${employee.phoneNumber}">1234567890</span></p>
             <p class="fs-6 mb-1"><strong>Email:</strong> <span th:text="${employee.email}">example@example.com</span>
             </p>
+            <button type="button" class="btn btn-link p-0 ms-2"
+              th:onclick="'location.href=\'/employee/delete/' + ${employee.id} + '\';'" title="Delete Employee">
+              <i class="bi bi-trash text-danger fs-5"></i>
+            </button>
           </div>
         </div>
       </div>

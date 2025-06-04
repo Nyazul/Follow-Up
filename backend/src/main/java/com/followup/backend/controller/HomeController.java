@@ -968,10 +968,14 @@ public class HomeController {
 
         List<DepartmentDTO> departments = departmentRepository.findAll()
                 .stream()
+                .filter(d -> !d.isDeleted())
                 .map(d -> new DepartmentDTO(d.getId(), d.getName()))
                 .toList();
 
-        List<Course> courses = courseRepository.findAll();
+        List<Course> courses = courseRepository.findAll()
+                .stream()
+                .filter(c -> !c.isDeleted())
+                .toList();
         courses.forEach(course -> {
             course.getDepartment();
         });
@@ -1016,6 +1020,42 @@ public class HomeController {
         courseRepository.save(course);
 
         redirAttrs.addFlashAttribute("message", "Course added successfully");
+        return "redirect:/master/course";
+    }
+
+
+    @RequestMapping("/course/delete/{id}")
+    public String deleteCourse(@PathVariable Long id, HttpSession session, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        Course course = courseRepository.findById(id).orElse(null);
+        
+        //set all associated follow-ups to deleted
+        followUpRepository.findAll().forEach(followUp -> {
+            if (followUp.getCourse() != null && followUp.getCourse().getCode() == course.getCode()) {
+                followUp.setDeleted(true);
+                followUp.setUpdatedAt(LocalDateTime.now());
+                followUpRepository.save(followUp);
+            }
+        });
+
+        course.setDeleted(true);
+        course.setUpdatedAt(LocalDateTime.now());
+        courseRepository.save(course);
+
+        redirAttrs.addFlashAttribute("message", "Course deleted successfully");
         return "redirect:/master/course";
     }
 
@@ -1111,6 +1151,15 @@ public class HomeController {
             }
         });
 
+        // Set all courses in this department to deleted
+        courseRepository.findAll().forEach(course -> {
+            if (course.getDepartment() != null && course.getDepartment().getId() == id) {
+                course.setDeleted(true);
+                course.setUpdatedAt(LocalDateTime.now());
+                courseRepository.save(course);
+            }
+        });
+
         redirAttrs.addFlashAttribute("message", "Department deleted successfully");
         return "redirect:/master/department";
     }
@@ -1194,6 +1243,38 @@ public class HomeController {
         followUpEmployeeRepository.save(followUpEmployee);
 
         redirAttrs.addFlashAttribute("message", "Employee added successfully");
+        return "redirect:/master/employee";
+    }
+
+    @RequestMapping("/employee/delete/{id}")
+    public String deleteEmployee(@PathVariable Long id, HttpSession session, RedirectAttributes redirAttrs) {
+        String email = (String) session.getAttribute("userEmail");
+        String role = (String) session.getAttribute("userRole");
+
+        if (email == null || !role.equals("ADMIN")) {
+            redirAttrs.addFlashAttribute("error", "Unauthorized access");
+            return "redirect:/login";
+        }
+
+        Admin user = adminRepository.findByEmail(email);
+        if (user == null) {
+            redirAttrs.addFlashAttribute("error", "User not found");
+            return "redirect:/login";
+        }
+
+        FollowUpEmployee employee = followUpEmployeeRepository.findById(id).orElse(null);
+
+        employee.setDeleted(true);
+        employee.setUpdatedAt(LocalDateTime.now());
+        followUpEmployeeRepository.save(employee);
+
+        taskRepository.findAll().forEach(task -> {
+            if (task.getUser() != null && task.getUser().getId() == id) {
+                taskRepository.delete(task);    
+            }
+        });
+
+        redirAttrs.addFlashAttribute("message", "Employee deleted successfully");
         return "redirect:/master/employee";
     }
 

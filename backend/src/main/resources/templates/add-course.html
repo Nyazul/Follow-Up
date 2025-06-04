@@ -73,6 +73,9 @@
           <div>
             <p class="fs-6"><strong>Department : </strong><span th:text="${course.department.name}">Science</span></p>
           </div>
+          <button type="button" class="btn btn-link p-0 ms-2" th:onclick="'location.href=\'/course/delete/' + ${course.code} + '\';'" title="Delete Course">
+            <i class="bi bi-trash text-danger fs-5"></i>
+          </button>
         </div>
       </div>
     </div>
